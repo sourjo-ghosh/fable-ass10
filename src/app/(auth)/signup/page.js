@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,14 +17,18 @@ export default function SignupPage() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validate = () => {
     const newErrors = {};
     if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
     if (!formData.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
     if (!formData.password) newErrors.password = "Password is required";
-    else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
@@ -38,27 +43,37 @@ export default function SignupPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }),
+      const formValues = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(formValues.entries());
+      console.log("Submitting signup data:", payload);
+      const { data, error } = await authClient.signUp.email({
+        name: payload.fullName, // required
+        email: payload.email, // required
+        password: payload.confirmPassword, // required
+        // image: "https://example.com/image.png",
+        // callbackURL: "https://example.com/callback",
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Registration failed");
+
+      // const res = await fetch("/api/auth/register", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     fullName: payload.fullName || formData.fullName,
+      //     email: payload.email || formData.email,
+      //     password: payload.password || formData.password,
+      //     role: payload.role || formData.role,
+      //   }),
+      // });
+
+      if (error) {
+        throw new Error(error.message || "Registration failed");
       }
-      const data = await res.json();
-      localStorage.setItem("token", data.token);
       router.push("/");
     } catch (err) {
       setErrors({ general: err.message || "Registration failed" });
     } finally {
       setIsSubmitting(false);
+      console.log('success')
     }
   };
 
@@ -102,7 +117,8 @@ export default function SignupPage() {
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(135deg, rgba(12,11,10,0.95) 0%, rgba(12,11,10,0.7) 50%, rgba(201,169,110,0.15) 100%)",
+            background:
+              "linear-gradient(135deg, rgba(12,11,10,0.95) 0%, rgba(12,11,10,0.7) 50%, rgba(201,169,110,0.15) 100%)",
             zIndex: 1,
           }}
         />
@@ -131,12 +147,26 @@ export default function SignupPage() {
               boxShadow: "0 4px 16px rgba(201,169,110,0.3)",
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0c0b0a" strokeWidth="2.5">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#0c0b0a"
+              strokeWidth="2.5"
+            >
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
             </svg>
           </div>
-          <span style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", fontWeight: 600, color: "#faf8f4" }}>
+          <span
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "1.6rem",
+              fontWeight: 600,
+              color: "#faf8f4",
+            }}
+          >
             Fable
           </span>
         </Link>
@@ -169,13 +199,27 @@ export default function SignupPage() {
           >
             "Books are a uniquely portable magic."
           </blockquote>
-          <cite style={{ fontSize: "0.85rem", color: "#a09880", fontStyle: "normal", fontWeight: 500 }}>
+          <cite
+            style={{
+              fontSize: "0.85rem",
+              color: "#a09880",
+              fontStyle: "normal",
+              fontWeight: 500,
+            }}
+          >
             — Stephen King
           </cite>
         </div>
 
         {/* Footer info */}
-        <div style={{ zIndex: 2, position: "relative", fontSize: "0.75rem", color: "#5a5548" }}>
+        <div
+          style={{
+            zIndex: 2,
+            position: "relative",
+            fontSize: "0.75rem",
+            color: "#5a5548",
+          }}
+        >
           © {new Date().getFullYear()} Fable Bookstore. Every word counts.
         </div>
       </div>
@@ -202,12 +246,20 @@ export default function SignupPage() {
             width: "300px",
             height: "300px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 70%)",
             pointerEvents: "none",
           }}
         />
 
-        <div style={{ width: "100%", maxWidth: "400px", zIndex: 2, padding: "20px 0" }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "400px",
+            zIndex: 2,
+            padding: "20px 0",
+          }}
+        >
           {/* Header */}
           <div style={{ marginBottom: "32px" }}>
             <h2
@@ -222,7 +274,9 @@ export default function SignupPage() {
             >
               Create account
             </h2>
-            <p style={{ fontSize: "0.9rem", color: "#a09880", fontWeight: 300 }}>
+            <p
+              style={{ fontSize: "0.9rem", color: "#a09880", fontWeight: 300 }}
+            >
               Join a community of readers and writers dedicated to literature.
             </p>
           </div>
@@ -312,7 +366,10 @@ export default function SignupPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <form
+            onSubmit={handleSubmit}
+            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+          >
             {errors.general && (
               <div
                 style={{
@@ -329,7 +386,9 @@ export default function SignupPage() {
             )}
 
             {/* Full Name */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+            >
               <label
                 htmlFor="fullName"
                 style={{
@@ -344,9 +403,12 @@ export default function SignupPage() {
               </label>
               <input
                 id="fullName"
+                name="fullName"
                 type="text"
                 value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, fullName: e.target.value })
+                }
                 placeholder="John Doe"
                 style={{
                   padding: "12px 16px",
@@ -359,19 +421,35 @@ export default function SignupPage() {
                   transition: "all 0.3s",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201, 169, 110, 0.4)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor =
+                    "rgba(201, 169, 110, 0.4)";
+                  e.currentTarget.style.background =
+                    "rgba(255, 255, 255, 0.05)";
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+                  e.currentTarget.style.borderColor =
+                    "rgba(255, 255, 255, 0.08)";
+                  e.currentTarget.style.background =
+                    "rgba(255, 255, 255, 0.03)";
                 }}
               />
-              {errors.fullName && <p style={{ color: "#f87171", fontSize: "0.75rem", marginTop: "2px" }}>{errors.fullName}</p>}
+              {errors.fullName && (
+                <p
+                  style={{
+                    color: "#f87171",
+                    fontSize: "0.75rem",
+                    marginTop: "2px",
+                  }}
+                >
+                  {errors.fullName}
+                </p>
+              )}
             </div>
 
             {/* Email Address */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+            >
               <label
                 htmlFor="email"
                 style={{
@@ -386,9 +464,12 @@ export default function SignupPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="name@example.com"
                 style={{
                   padding: "12px 16px",
@@ -401,19 +482,35 @@ export default function SignupPage() {
                   transition: "all 0.3s",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201, 169, 110, 0.4)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor =
+                    "rgba(201, 169, 110, 0.4)";
+                  e.currentTarget.style.background =
+                    "rgba(255, 255, 255, 0.05)";
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+                  e.currentTarget.style.borderColor =
+                    "rgba(255, 255, 255, 0.08)";
+                  e.currentTarget.style.background =
+                    "rgba(255, 255, 255, 0.03)";
                 }}
               />
-              {errors.email && <p style={{ color: "#f87171", fontSize: "0.75rem", marginTop: "2px" }}>{errors.email}</p>}
+              {errors.email && (
+                <p
+                  style={{
+                    color: "#f87171",
+                    fontSize: "0.75rem",
+                    marginTop: "2px",
+                  }}
+                >
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             {/* Password */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+            >
               <label
                 htmlFor="password"
                 style={{
@@ -426,36 +523,78 @@ export default function SignupPage() {
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="••••••••"
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: "12px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "#faf8f4",
-                  fontSize: "0.875rem",
-                  outline: "none",
-                  transition: "all 0.3s",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201, 169, 110, 0.4)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
-                }}
-              />
-              {errors.password && <p style={{ color: "#f87171", fontSize: "0.75rem", marginTop: "2px" }}>{errors.password}</p>}
+              <div style={{ position: "relative" }}>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    paddingRight: "70px",
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "#faf8f4",
+                    fontSize: "0.875rem",
+                    outline: "none",
+                    transition: "all 0.3s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      "rgba(201, 169, 110, 0.4)";
+                    e.currentTarget.style.background =
+                      "rgba(255, 255, 255, 0.05)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor =
+                      "rgba(255, 255, 255, 0.08)";
+                    e.currentTarget.style.background =
+                      "rgba(255, 255, 255, 0.03)";
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    color: "#c9a96e",
+                    cursor: "pointer",
+                    fontSize: "0.78rem",
+                    fontWeight: 600,
+                    padding: 0,
+                  }}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {errors.password && (
+                <p
+                  style={{
+                    color: "#f87171",
+                    fontSize: "0.75rem",
+                    marginTop: "2px",
+                  }}
+                >
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             {/* Confirm Password */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+            >
               <label
                 htmlFor="confirmPassword"
                 style={{
@@ -468,36 +607,83 @@ export default function SignupPage() {
               >
                 Confirm Password
               </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                placeholder="••••••••"
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: "12px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                  color: "#faf8f4",
-                  fontSize: "0.875rem",
-                  outline: "none",
-                  transition: "all 0.3s",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201, 169, 110, 0.4)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
-                }}
-              />
-              {errors.confirmPassword && <p style={{ color: "#f87171", fontSize: "0.75rem", marginTop: "2px" }}>{errors.confirmPassword}</p>}
+              <div style={{ position: "relative" }}>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    paddingRight: "70px",
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    color: "#faf8f4",
+                    fontSize: "0.875rem",
+                    outline: "none",
+                    transition: "all 0.3s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      "rgba(201, 169, 110, 0.4)";
+                    e.currentTarget.style.background =
+                      "rgba(255, 255, 255, 0.05)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor =
+                      "rgba(255, 255, 255, 0.08)";
+                    e.currentTarget.style.background =
+                      "rgba(255, 255, 255, 0.03)";
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    color: "#c9a96e",
+                    cursor: "pointer",
+                    fontSize: "0.78rem",
+                    fontWeight: 600,
+                    padding: 0,
+                  }}
+                >
+                  {showConfirmPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p
+                  style={{
+                    color: "#f87171",
+                    fontSize: "0.75rem",
+                    marginTop: "2px",
+                  }}
+                >
+                  {errors.confirmPassword}
+                </p>
+              )}
             </div>
 
+            <input type="hidden" name="role" value={formData.role} />
+
             {/* Role selector */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+            >
               <label
                 style={{
                   fontSize: "0.68rem",
@@ -509,15 +695,27 @@ export default function SignupPage() {
               >
                 I want to join as
               </label>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "10px",
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, role: "reader" })}
                   style={{
                     padding: "11px",
                     borderRadius: "12px",
-                    border: formData.role === "reader" ? "1px solid #c9a96e" : "1px solid rgba(255, 255, 255, 0.08)",
-                    background: formData.role === "reader" ? "rgba(201, 169, 110, 0.08)" : "transparent",
+                    border:
+                      formData.role === "reader"
+                        ? "1px solid #c9a96e"
+                        : "1px solid rgba(255, 255, 255, 0.08)",
+                    background:
+                      formData.role === "reader"
+                        ? "rgba(201, 169, 110, 0.08)"
+                        : "transparent",
                     color: formData.role === "reader" ? "#c9a96e" : "#a09880",
                     fontSize: "0.85rem",
                     fontWeight: 600,
@@ -533,8 +731,14 @@ export default function SignupPage() {
                   style={{
                     padding: "11px",
                     borderRadius: "12px",
-                    border: formData.role === "writer" ? "1px solid #c9a96e" : "1px solid rgba(255, 255, 255, 0.08)",
-                    background: formData.role === "writer" ? "rgba(201, 169, 110, 0.08)" : "transparent",
+                    border:
+                      formData.role === "writer"
+                        ? "1px solid #c9a96e"
+                        : "1px solid rgba(255, 255, 255, 0.08)",
+                    background:
+                      formData.role === "writer"
+                        ? "rgba(201, 169, 110, 0.08)"
+                        : "transparent",
                     color: formData.role === "writer" ? "#c9a96e" : "#a09880",
                     fontSize: "0.85rem",
                     fontWeight: 600,
@@ -564,7 +768,14 @@ export default function SignupPage() {
           </form>
 
           {/* Redirect link */}
-          <p style={{ marginTop: "24px", textAlign: "center", fontSize: "0.875rem", color: "#a09880" }}>
+          <p
+            style={{
+              marginTop: "24px",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#a09880",
+            }}
+          >
             Already have an account?{" "}
             <Link
               href="/login"
@@ -574,8 +785,12 @@ export default function SignupPage() {
                 textDecoration: "none",
                 transition: "color 0.2s",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "#e2c48a"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "#c9a96e"; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#e2c48a";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#c9a96e";
+              }}
             >
               Sign in
             </Link>

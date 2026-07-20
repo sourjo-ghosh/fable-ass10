@@ -4,19 +4,23 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validate = () => {
     const newErrors = {};
     if (!formData.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
     if (!formData.password) newErrors.password = "Password is required";
-    else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
     return newErrors;
   };
 
@@ -28,22 +32,21 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/auth/login", {
-      method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+      const formValues = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(formValues.entries());
+      console.log(payload)
+      const { data, error } = await authClient.signIn.email({
+        email: payload.email, // required
+        password: payload.password, // required
+        rememberMe: true,
+        // callbackURL: "https://example.com/callback",
       });
-      if (!res.ok) throw new Error("Login failed");
-      const responseData = await res.json();
-      localStorage.setItem("token", responseData.token);
-      router.push("/");
-    } catch (err) {
+    } catch (error) {
       setErrors({ general: err.message || "Invalid credentials" });
     } finally {
       setIsSubmitting(false);
     }
   };
-
   const handleGoogleLogin = () => {
     window.location.href = "/api/auth/google";
   };
@@ -84,7 +87,8 @@ export default function LoginPage() {
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(135deg, rgba(12,11,10,0.95) 0%, rgba(12,11,10,0.7) 50%, rgba(201,169,110,0.15) 100%)",
+            background:
+              "linear-gradient(135deg, rgba(12,11,10,0.95) 0%, rgba(12,11,10,0.7) 50%, rgba(201,169,110,0.15) 100%)",
             zIndex: 1,
           }}
         />
@@ -113,12 +117,26 @@ export default function LoginPage() {
               boxShadow: "0 4px 16px rgba(201,169,110,0.3)",
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0c0b0a" strokeWidth="2.5">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#0c0b0a"
+              strokeWidth="2.5"
+            >
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
             </svg>
           </div>
-          <span style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", fontWeight: 600, color: "#faf8f4" }}>
+          <span
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "1.6rem",
+              fontWeight: 600,
+              color: "#faf8f4",
+            }}
+          >
             Fable
           </span>
         </Link>
@@ -151,13 +169,27 @@ export default function LoginPage() {
           >
             "A room without books is like a body without a soul."
           </blockquote>
-          <cite style={{ fontSize: "0.85rem", color: "#a09880", fontStyle: "normal", fontWeight: 500 }}>
+          <cite
+            style={{
+              fontSize: "0.85rem",
+              color: "#a09880",
+              fontStyle: "normal",
+              fontWeight: 500,
+            }}
+          >
             — Marcus Tullius Cicero
           </cite>
         </div>
 
         {/* Footer info */}
-        <div style={{ zIndex: 2, position: "relative", fontSize: "0.75rem", color: "#5a5548" }}>
+        <div
+          style={{
+            zIndex: 2,
+            position: "relative",
+            fontSize: "0.75rem",
+            color: "#5a5548",
+          }}
+        >
           © {new Date().getFullYear()} Fable Bookstore. Every word counts.
         </div>
       </div>
@@ -183,7 +215,8 @@ export default function LoginPage() {
             width: "300px",
             height: "300px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 70%)",
             pointerEvents: "none",
           }}
         />
@@ -203,7 +236,9 @@ export default function LoginPage() {
             >
               Welcome back
             </h2>
-            <p style={{ fontSize: "0.9rem", color: "#a09880", fontWeight: 300 }}>
+            <p
+              style={{ fontSize: "0.9rem", color: "#a09880", fontWeight: 300 }}
+            >
               Access your digital bookshelf and pick up where you left off.
             </p>
           </div>
@@ -293,7 +328,34 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <form
+            onSubmit={handleSubmit}
+            style={{ display: "flex", flexDirection: "column", gap: "24px" }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  email: "admin@fable.com",
+                  password: "admin123",
+                });
+              }}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                borderRadius: "12px",
+                border: "1px solid rgba(201, 169, 110, 0.35)",
+                background: "rgba(201, 169, 110, 0.08)",
+                color: "#c9a96e",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Login as a admin
+            </button>
+
             {errors.general && (
               <div
                 style={{
@@ -310,7 +372,9 @@ export default function LoginPage() {
             )}
 
             {/* Email field */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+            >
               <label
                 htmlFor="email"
                 style={{
@@ -325,9 +389,12 @@ export default function LoginPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="name@example.com"
                 style={{
                   padding: "14px 18px",
@@ -340,19 +407,35 @@ export default function LoginPage() {
                   transition: "all 0.3s",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201, 169, 110, 0.4)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor =
+                    "rgba(201, 169, 110, 0.4)";
+                  e.currentTarget.style.background =
+                    "rgba(255, 255, 255, 0.05)";
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+                  e.currentTarget.style.borderColor =
+                    "rgba(255, 255, 255, 0.08)";
+                  e.currentTarget.style.background =
+                    "rgba(255, 255, 255, 0.03)";
                 }}
               />
-              {errors.email && <p style={{ color: "#f87171", fontSize: "0.75rem", marginTop: "4px" }}>{errors.email}</p>}
+              {errors.email && (
+                <p
+                  style={{
+                    color: "#f87171",
+                    fontSize: "0.75rem",
+                    marginTop: "4px",
+                  }}
+                >
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             {/* Password field */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+            >
               <label
                 htmlFor="password"
                 style={{
@@ -365,32 +448,72 @@ export default function LoginPage() {
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="••••••••"
-                style={{
-                  padding: "14px 18px",
-                  borderRadius: "14px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "#faf8f4",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  transition: "all 0.3s",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201, 169, 110, 0.4)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
-                }}
-              />
-              {errors.password && <p style={{ color: "#f87171", fontSize: "0.75rem", marginTop: "4px" }}>{errors.password}</p>}
+              <div style={{ position: "relative" }}>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    padding: "14px 18px",
+                    paddingRight: "70px",
+                    borderRadius: "14px",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "#faf8f4",
+                    fontSize: "0.9rem",
+                    outline: "none",
+                    transition: "all 0.3s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor =
+                      "rgba(201, 169, 110, 0.4)";
+                    e.currentTarget.style.background =
+                      "rgba(255, 255, 255, 0.05)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor =
+                      "rgba(255, 255, 255, 0.08)";
+                    e.currentTarget.style.background =
+                      "rgba(255, 255, 255, 0.03)";
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    color: "#c9a96e",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    padding: 0,
+                  }}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {errors.password && (
+                <p
+                  style={{
+                    color: "#f87171",
+                    fontSize: "0.75rem",
+                    marginTop: "4px",
+                  }}
+                >
+                  {errors.password}
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}
@@ -410,7 +533,14 @@ export default function LoginPage() {
           </form>
 
           {/* Redirect link */}
-          <p style={{ marginTop: "32px", textAlign: "center", fontSize: "0.875rem", color: "#a09880" }}>
+          <p
+            style={{
+              marginTop: "32px",
+              textAlign: "center",
+              fontSize: "0.875rem",
+              color: "#a09880",
+            }}
+          >
             New to Fable?{" "}
             <Link
               href="/signup"
@@ -420,8 +550,12 @@ export default function LoginPage() {
                 textDecoration: "none",
                 transition: "color 0.2s",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "#e2c48a"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "#c9a96e"; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#e2c48a";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#c9a96e";
+              }}
             >
               Create an account
             </Link>
