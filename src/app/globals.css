@@ -1,26 +1,206 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Colors */
+  --color-bg-deep: #0c0b0a;
+  --color-bg-card: #131210;
+  --color-bg-raised: #1a1815;
+  --color-bg-hover: #211f1b;
+  --color-bg-footer: #080807;
+  --color-bg-section: #0f0e0d;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-gold: #c9a96e;
+  --color-gold-light: #e2c48a;
+  --color-gold-dim: rgba(201, 169, 110, 0.12);
+  --color-gold-glow: rgba(201, 169, 110, 0.25);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-ink: #faf8f4;
+  --color-ink-muted: #a09880;
+  --color-ink-faint: #5a5548;
+  --color-ink-dim: #3a3530;
+
+  --color-background: #0c0b0a;
+  --color-surface: #131210;
+  --color-foreground: #faf8f4;
+  --color-muted: #a09880;
+  --color-primary: #c9a96e;
+  --color-primary-hover: #e2c48a;
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-light: rgba(255, 255, 255, 0.12);
+
+  /* Fonts */
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-dm-sans), "DM Sans", system-ui, sans-serif;
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+
+  /* Animations */
+  --animate-float-a: float-a 6s ease-in-out infinite;
+  --animate-float-b: float-b 7s ease-in-out infinite;
+  --animate-float-c: float-c 8s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-scale-in: scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-marquee-slow: marquee 50s linear infinite;
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+  --animate-shimmer: shimmer 5s linear infinite;
+
+  @keyframes float-a {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-18px) rotate(-2deg); }
+  }
+  @keyframes float-b {
+    0%, 100% { transform: translateY(-10px) rotate(2deg); }
+    50% { transform: translateY(8px) rotate(2deg); }
+  }
+  @keyframes float-c {
+    0%, 100% { transform: translateY(-4px) rotate(-1deg); }
+    50% { transform: translateY(-22px) rotate(-1deg); }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% center; }
+    to { background-position: 200% center; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(32px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    @apply scroll-smooth antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply min-h-dvh overflow-x-hidden bg-bg-deep font-sans text-ink;
+  }
+
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-deep;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-ink-faint;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gold;
+  }
+
+  ::selection {
+    background: var(--color-gold-dim);
+    color: var(--color-gold-light);
+  }
+}
+
+@layer components {
+  .text-shimmer {
+    background: linear-gradient(
+      135deg,
+      var(--color-gold-light) 0%,
+      var(--color-gold) 30%,
+      var(--color-ink) 50%,
+      var(--color-gold) 70%,
+      var(--color-gold-light) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    @apply animate-shimmer;
+  }
+
+  .section-eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-gold-dim bg-gold-dim px-3.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-gold;
+  }
+
+  .divider-gold {
+    @apply h-px bg-gradient-to-r from-transparent via-gold-dim to-transparent;
+  }
+
+  .btn-gold {
+    @apply relative inline-flex cursor-pointer items-center gap-2 overflow-hidden rounded-full border-none px-8 py-3.5 text-sm font-semibold tracking-wide text-bg-deep transition-all duration-300;
+    background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
+  }
+  .btn-gold::before {
+    content: "";
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(135deg, white, transparent);
+  }
+  .btn-gold:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 12px 40px var(--color-gold-glow);
+  }
+  .btn-gold:hover::before {
+    opacity: 0.15;
+  }
+
+  .btn-ghost {
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-border-light bg-transparent px-[30px] py-[13px] text-sm font-medium tracking-wide text-ink transition-all duration-300;
+  }
+  .btn-ghost:hover {
+    @apply border-gold bg-gold-dim text-gold-light;
+  }
+
+  .marquee-track {
+    @apply flex w-max;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .input-dark {
+    @apply w-full rounded-xl border border-white/[0.08] bg-white/[0.05] px-4 py-3 font-[inherit] text-sm text-ink outline-none transition-all placeholder:text-ink-faint focus:border-gold/30 focus:bg-white/[0.08];
+  }
+
+  .label-dark {
+    @apply mb-2 block text-[0.65rem] font-semibold tracking-[0.15em] text-ink-faint uppercase;
+  }
+
+  .auth-divider {
+    @apply relative my-7;
+  }
+  .auth-divider::before {
+    content: "";
+    @apply absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/[0.08];
+  }
+  .auth-divider span {
+    @apply relative mx-auto block w-fit bg-bg-card px-4 text-[0.75rem] tracking-wide text-ink-faint;
+  }
+
+  .btn-google {
+    @apply flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm font-medium text-ink transition-all duration-300 hover:border-gold/25 hover:bg-gold-dim hover:text-gold-light;
+  }
+
+  .role-toggle {
+    @apply rounded-xl border px-4 py-3.5 text-sm font-medium transition-all duration-300;
+  }
+  .role-toggle-active {
+    @apply border-gold/35 bg-gold-dim text-gold;
+  }
+  .role-toggle-inactive {
+    @apply border-white/[0.08] bg-white/[0.03] text-ink-muted hover:border-white/[0.14] hover:text-ink;
+  }
 }
