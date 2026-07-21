@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,19 +35,25 @@ export default function LoginPage() {
     try {
       const formValues = new FormData(e.currentTarget);
       const payload = Object.fromEntries(formValues.entries());
-      console.log(payload)
       const { data, error } = await authClient.signIn.email({
-        email: payload.email, // required
-        password: payload.password, // required
+        email: payload.email,
+        password: payload.password,
         rememberMe: true,
-        // callbackURL: "https://example.com/callback",
+        callbackURL: "/",
       });
-    } catch (error) {
+
+      if (error) throw new Error(error.message || "Invalid credentials");
+
+      toast.success("Welcome back!");
+      router.push("/");
+    } catch (err) {
       setErrors({ general: err.message || "Invalid credentials" });
+      toast.error(err.message || "Invalid credentials");
     } finally {
       setIsSubmitting(false);
     }
   };
+
   const handleGoogleLogin = () => {
     window.location.href = "/api/auth/google";
   };
@@ -572,4 +579,7 @@ export default function LoginPage() {
       `}</style>
     </div>
   );
+
 }
+
+

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function SignupPage() {
         email: payload.email, // required
         password: payload.confirmPassword, // required
         // image: "https://example.com/image.png",
-        // callbackURL: "https://example.com/callback",
+        callbackURL: "/",
       });
 
       // const res = await fetch("/api/auth/register", {
@@ -68,9 +69,11 @@ export default function SignupPage() {
       if (error) {
         throw new Error(error.message || "Registration failed");
       }
+      toast.success(`Welcome, ${payload.fullName || "new user"}!`);
       router.push("/");
     } catch (err) {
       setErrors({ general: err.message || "Registration failed" });
+      toast.error(err.message || "Registration failed");
     } finally {
       setIsSubmitting(false);
       console.log('success')
