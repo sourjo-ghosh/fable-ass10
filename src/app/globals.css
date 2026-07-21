@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@heroui/styles"; 
 
 @theme {
   /* Colors */
@@ -34,28 +35,11 @@
   --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
 
   /* Animations */
-  --animate-float-a: float-a 6s ease-in-out infinite;
-  --animate-float-b: float-b 7s ease-in-out infinite;
-  --animate-float-c: float-c 8s ease-in-out infinite;
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
   --animate-scale-in: scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   --animate-marquee: marquee 30s linear infinite;
-  --animate-marquee-slow: marquee 50s linear infinite;
-  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
   --animate-shimmer: shimmer 5s linear infinite;
 
-  @keyframes float-a {
-    0%, 100% { transform: translateY(0) rotate(-2deg); }
-    50% { transform: translateY(-18px) rotate(-2deg); }
-  }
-  @keyframes float-b {
-    0%, 100% { transform: translateY(-10px) rotate(2deg); }
-    50% { transform: translateY(8px) rotate(2deg); }
-  }
-  @keyframes float-c {
-    0%, 100% { transform: translateY(-4px) rotate(-1deg); }
-    50% { transform: translateY(-22px) rotate(-1deg); }
-  }
   @keyframes shimmer {
     from { background-position: -200% center; }
     to { background-position: 200% center; }
@@ -71,14 +55,6 @@
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
-  }
-  @keyframes pulse-ring {
-    0% { transform: scale(1); opacity: 0.6; }
-    100% { transform: scale(2.2); opacity: 0; }
-  }
-  @keyframes glow-pulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 0.8; }
   }
 }
 
@@ -170,37 +146,5 @@
   .marquee-track:hover {
     animation-play-state: paused;
   }
-
-  .input-dark {
-    @apply w-full rounded-xl border border-white/[0.08] bg-white/[0.05] px-4 py-3 font-[inherit] text-sm text-ink outline-none transition-all placeholder:text-ink-faint focus:border-gold/30 focus:bg-white/[0.08];
-  }
-
-  .label-dark {
-    @apply mb-2 block text-[0.65rem] font-semibold tracking-[0.15em] text-ink-faint uppercase;
-  }
-
-  .auth-divider {
-    @apply relative my-7;
-  }
-  .auth-divider::before {
-    content: "";
-    @apply absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/[0.08];
-  }
-  .auth-divider span {
-    @apply relative mx-auto block w-fit bg-bg-card px-4 text-[0.75rem] tracking-wide text-ink-faint;
-  }
-
-  .btn-google {
-    @apply flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm font-medium text-ink transition-all duration-300 hover:border-gold/25 hover:bg-gold-dim hover:text-gold-light;
-  }
-
-  .role-toggle {
-    @apply rounded-xl border px-4 py-3.5 text-sm font-medium transition-all duration-300;
-  }
-  .role-toggle-active {
-    @apply border-gold/35 bg-gold-dim text-gold;
-  }
-  .role-toggle-inactive {
-    @apply border-white/[0.08] bg-white/[0.03] text-ink-muted hover:border-white/[0.14] hover:text-ink;
-  }
 }
+

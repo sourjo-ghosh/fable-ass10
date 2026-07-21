@@ -10,12 +10,13 @@ const authRoutes = ["/login", "/signup"];
 export default function RootLayoutClient({ children }) {
   const pathname = usePathname();
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isDashboardRoute = pathname.startsWith("/dashboard");
 
   return (
     <>
-      {!isAuthRoute && <Navbar />}
+      {!isAuthRoute && !isDashboardRoute && <Navbar />}
       <main className="flex-1">{children}</main>
-      {!isAuthRoute && <Footer />}
+      {!isAuthRoute && !isDashboardRoute && <Footer />}
       <Toaster
         position="top-right"
         toastOptions={{

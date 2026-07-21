@@ -51,6 +51,7 @@ export default function SignupPage() {
         name: payload.fullName, // required
         email: payload.email, // required
         password: payload.confirmPassword, // required
+        role: payload.role, // optional, default is "reader"
         // image: "https://example.com/image.png",
         callbackURL: "/",
       });
@@ -69,14 +70,19 @@ export default function SignupPage() {
       if (error) {
         throw new Error(error.message || "Registration failed");
       }
-      toast.success(`Welcome, ${payload.fullName || "new user"}!`);
-      router.push("/");
+    toast.success(`Success! Please Login to continue.`);
     } catch (err) {
       setErrors({ general: err.message || "Registration failed" });
       toast.error(err.message || "Registration failed");
     } finally {
       setIsSubmitting(false);
-      console.log('success')
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            router.push("/login"); // redirect to login page
+          },
+        },
+      });
     }
   };
 
