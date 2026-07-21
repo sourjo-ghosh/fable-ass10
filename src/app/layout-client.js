@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 
-const authRoutes = ["/login", "/signup"];
+const authRoutes = ["/login", "/signup", "/role-selector"];
 
 export default function RootLayoutClient({ children }) {
   const pathname = usePathname();

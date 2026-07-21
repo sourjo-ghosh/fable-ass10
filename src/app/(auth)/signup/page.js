@@ -86,8 +86,20 @@ export default function SignupPage() {
     }
   };
 
-  const handleGoogleSignup = () => {
-    window.location.href = "/api/auth/google";
+  const handleGoogleSignup = async () => {
+    setErrors({});
+    setIsSubmitting(true);
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/role-selector",
+        newUserCallbackURL: "/role-selector",
+      });
+    } catch (err) {
+      setErrors({ general: err.message || "Unable to continue with Google" });
+      toast.error(err.message || "Unable to continue with Google");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -292,7 +304,9 @@ export default function SignupPage() {
 
           {/* Social signup button */}
           <button
+            type="button"
             onClick={handleGoogleSignup}
+            disabled={isSubmitting}
             style={{
               display: "flex",
               width: "100%",

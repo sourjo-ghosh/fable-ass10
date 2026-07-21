@@ -39,13 +39,13 @@ export default function LoginPage() {
         email: payload.email,
         password: payload.password,
         rememberMe: true,
-        callbackURL: "/",
+        callbackURL: "/role-selector",
       });
 
       if (error) throw new Error(error.message || "Invalid credentials");
 
       toast.success("Welcome back!");
-      router.push("/");
+      router.replace("/role-selector");
     } catch (err) {
       setErrors({ general: err.message || "Invalid credentials" });
       toast.error(err.message || "Invalid credentials");
@@ -54,8 +54,19 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "/api/auth/google";
+  const handleGoogleLogin = async () => {
+    setErrors({});
+    setIsSubmitting(true);
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/role-selector",
+      });
+    } catch (err) {
+      setErrors({ general: err.message || "Unable to continue with Google" });
+      toast.error(err.message || "Unable to continue with Google");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -252,7 +263,9 @@ export default function LoginPage() {
 
           {/* Social login button */}
           <button
+            type="button"
             onClick={handleGoogleLogin}
+            disabled={isSubmitting}
             style={{
               display: "flex",
               width: "100%",
@@ -339,7 +352,7 @@ export default function LoginPage() {
             onSubmit={handleSubmit}
             style={{ display: "flex", flexDirection: "column", gap: "24px" }}
           >
-            <button
+            {/* <button
               type="button"
               onClick={() => {
                 setFormData({
@@ -361,7 +374,7 @@ export default function LoginPage() {
               }}
             >
               Login as a admin
-            </button>
+            </button> */}
 
             {errors.general && (
               <div
@@ -581,5 +594,4 @@ export default function LoginPage() {
   );
 
 }
-
 
