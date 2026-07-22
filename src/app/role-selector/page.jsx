@@ -43,8 +43,8 @@ export default function RoleSelectorPage() {
     }
 
     toast.success(`Welcome to Fable, ${role.title}!`);
-    router.replace(role.href);
-    router.refresh();
+    router.replace("/");
+    // router.refresh();
   };
 
   if (isPending || !session) {

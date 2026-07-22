@@ -39,13 +39,18 @@ export default function LoginPage() {
         email: payload.email,
         password: payload.password,
         rememberMe: true,
-        callbackURL: "/role-selector",
+        // callbackURL: "/role-selector",
       });
 
       if (error) throw new Error(error.message || "Invalid credentials");
 
       toast.success("Welcome back!");
-      router.replace("/role-selector");
+      console.log("User data after login:", data); 
+      if(data?.user?.role === "") {
+        router.replace("/role-selector");
+      } else {
+        router.replace("/")
+      }
     } catch (err) {
       setErrors({ general: err.message || "Invalid credentials" });
       toast.error(err.message || "Invalid credentials");

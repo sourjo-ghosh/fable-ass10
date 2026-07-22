@@ -14,7 +14,7 @@ export default function SignupPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "reader",
+    role: null, // "reader" or "writer"
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -704,7 +704,7 @@ export default function SignupPage() {
             <input type="hidden" name="role" value={formData.role} />
 
             {/* Role selector */}
-            <div
+            {/* <div
               style={{ display: "flex", flexDirection: "column", gap: "8px" }}
             >
               <label
@@ -772,7 +772,7 @@ export default function SignupPage() {
                   Writer
                 </button>
               </div>
-            </div>
+            </div> */}
 
             {/* Submit Button */}
             <button
