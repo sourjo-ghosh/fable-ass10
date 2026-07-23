@@ -7,10 +7,19 @@ export default function EbookForm({
   initialBook = {},
   submitLabel = "Create ebook",
 }) {
-  const [preview, setPreview] = useState(initialBook.cover || "");
+  const [preview, setPreview] = useState(
+    initialBook.cover || initialBook.coverImage || "",
+  );
+  const [imageUrl, setImageUrl] = useState(
+    initialBook.cover || initialBook.coverImage || "",
+  );
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const imgbbKey =
+    process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API ||
+    process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
   const chooseImage = (event) => {
     const selectedFile = event.target.files?.[0];
@@ -20,57 +29,80 @@ export default function EbookForm({
     setMessage("");
   };
 
-  const submitForm = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    const imgbbKey = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_API;
-    const fromData = new FormData(e.target);
-    const data = Object.fromEntries(fromData.entries());
+  const UploadImage = async (fileToUpload, key) => {
     try {
-      if (file && imgbbKey) {
+      if (fileToUpload && key) {
         const upload = new FormData();
-        upload.append("image", file);
+        upload.append("image", fileToUpload);
         const response = await fetch(
-          `https://api.imgbb.com/1/upload?key=${imgbbKey}`,
+          `https://api.imgbb.com/1/upload?key=${key}`,
           { method: "POST", body: upload },
         );
-        if (!response.ok) throw new Error("Image upload failed");
-        const imgData = await response.json();
-        fromData.set("coverImage", imgData.data.url);
-        setPreview(imgData.data.url);
-        setMessage(
-          "Cover uploaded successfully.",
-        );
-      } else if (file) {
-        setMessage(
-          "Cover preview ready.",
-        );
-      } else {
-        setMessage(
-          "Form is ready.",
-        );
+        if (!response.ok) throw new Error("Failed to upload image");
+        const data = await response.json();
+        const uploadedUrl = data?.data?.url;
+        if (uploadedUrl) {
+          setImageUrl(uploadedUrl);
+          setPreview(uploadedUrl);
+          return uploadedUrl;
+        }
       }
+      return "";
     } catch (error) {
-      setMessage(error.message || "Unable to upload the cover image.");
+      console.error(error);
+      return "";
+    }
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    const formElement = e.currentTarget;
+    setSubmitting(true);
+    setMessage("");
+
+    try {
+      let finalCoverUrl =
+        imageUrl || initialBook.cover || initialBook.coverImage || "";
+
+      if (file) {
+        setMessage("Uploading cover image...");
+        const uploaded = await UploadImage(file, imgbbKey);
+        if (uploaded) {
+          finalCoverUrl = uploaded;
+        } else {
+          setMessage("Unable to upload cover image. Please try again.");
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      const formData = new FormData(formElement);
+      const title = formData.get("title");
+      const content = formData.get("content");
+      const price = parseFloat(formData.get("price"));
+      const genre = formData.get("genre");
+
+      const bookData = {
+        title,
+        content,
+        price,
+        genre,
+        coverImage: finalCoverUrl,
+      };
+
+      console.log("Ebook Data:", bookData);
+      setMessage("Ebook saved successfully!");
+    } catch (error) {
+      console.error(error);
+      setMessage("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
-    }
-    // console.log(data);
-    const formData = {
-      title: data.title,
-      content: data.content,
-      price: parseFloat(data.price),
-      genre: data.genre,
-      coverImage: data.coverImage || preview || "",
-    };
-    console.log("Form Data:", formData);
-    // Here you can send formData to your backend or API
     }
   };
 
   return (
     <form
-      onSubmit={submitForm}
+      onSubmit={submit}
       className="mt-8 grid gap-6 lg:grid-cols-[1fr_300px]"
     >
       <div className="space-y-5 rounded-2xl border border-white/[0.07] bg-bg-card p-6">
@@ -79,8 +111,9 @@ export default function EbookForm({
             Title
           </span>
           <input
+            name="title"
             required
-            defaultValue={initialBook.title}
+            defaultValue={initialBook.title || ""}
             placeholder="Your ebook title"
             className="mt-2 w-full rounded-xl border border-white/[.1] bg-bg-raised px-4 py-3 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-gold/60"
           />
@@ -90,8 +123,9 @@ export default function EbookForm({
             Full content
           </span>
           <textarea
+            name="content"
             required
-            defaultValue={initialBook.content}
+            defaultValue={initialBook.content || ""}
             placeholder="Write or paste the full ebook content here…"
             rows="13"
             className="mt-2 w-full resize-y rounded-xl border border-white/[.1] bg-bg-raised px-4 py-3 text-sm leading-relaxed text-ink outline-none placeholder:text-ink-faint focus:border-gold/60"
@@ -103,11 +137,12 @@ export default function EbookForm({
               Price (USD)
             </span>
             <input
+              name="price"
               required
               min="0"
               step="0.01"
               type="number"
-              defaultValue={initialBook.price}
+              defaultValue={initialBook.price || ""}
               placeholder="12.99"
               className="mt-2 w-full rounded-xl border border-white/[.1] bg-bg-raised px-4 py-3 text-sm text-ink outline-none focus:border-gold/60"
             />
@@ -117,6 +152,7 @@ export default function EbookForm({
               Genre
             </span>
             <select
+              name="genre"
               required
               defaultValue={initialBook.genre || ""}
               className="mt-2 w-full rounded-xl border border-white/[.1] bg-bg-raised px-4 py-3 text-sm text-ink outline-none focus:border-gold/60"
@@ -133,7 +169,10 @@ export default function EbookForm({
             </select>
           </label>
         </div>
+
+        {/* Dedicated Submit Button inside the main section for improved UI/UX */}
       </div>
+
       <aside className="h-fit rounded-2xl border border-white/[0.07] bg-bg-card p-5">
         <p className="text-xs font-bold tracking-[.14em] text-ink-faint uppercase">
           Cover image
@@ -157,6 +196,7 @@ export default function EbookForm({
             </>
           )}
           <input
+            name="coverImage"
             type="file"
             accept="image/png,image/jpeg,image/webp"
             onChange={chooseImage}
@@ -164,20 +204,29 @@ export default function EbookForm({
           />
         </label>
         <p className="mt-3 text-xs leading-relaxed text-ink-muted">
-          Images upload through imgBB when{" "}
-          <code className="text-gold">NEXT_PUBLIC_IMGBB_API_KEY</code> is
-          configured.
+          Select a cover image to display on your ebook listing.
         </p>
-        <button
-          disabled={submitting}
-          className="btn-gold mt-5 w-full justify-center px-5 py-3 text-xs disabled:cursor-wait disabled:opacity-60"
-        >
-          <FaCloudArrowUp /> {submitting ? "Uploading…" : submitLabel}
-        </button>
-        {message && (
-          <p className="mt-3 text-xs leading-relaxed text-gold">{message}</p>
-        )}
       </aside>
+      <div className="pt-3 border-t border-white/[0.07]">
+          {/* <button
+            type="submit"
+            disabled={submitting}
+            className="btn-gold w-full justify-center px-5 py-3.5 text-xs font-semibold disabled:cursor-wait disabled:opacity-60"
+          >
+            <FaCloudArrowUp className="mr-1.5" />
+            {submitting ? "Saving..." : submitLabel}
+          </button> */}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn-gold mt-5 w-full justify-center px-5 py-3 text-xs disabled:cursor-wait disabled:opacity-60"
+          >
+            <FaCloudArrowUp /> {submitting ? "Saving..." : submitLabel}
+          </button>
+          {message && (
+            <p className="mt-3 text-xs leading-relaxed text-gold">{message}</p>
+          )}
+        </div>
     </form>
   );
-
+}
