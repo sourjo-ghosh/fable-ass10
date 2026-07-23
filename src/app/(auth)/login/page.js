@@ -32,6 +32,7 @@ export default function LoginPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     setIsSubmitting(true);
+    setErrors({});
     try {
       const formValues = new FormData(e.currentTarget);
       const payload = Object.fromEntries(formValues.entries());
@@ -39,21 +40,26 @@ export default function LoginPage() {
         email: payload.email,
         password: payload.password,
         rememberMe: true,
-        // callbackURL: "/role-selector",
       });
 
-      if (error) throw new Error(error.message || "Invalid credentials");
+      if (error) {
+        const errorMsg = error.message || "Invalid credentials";
+        setErrors({ general: errorMsg });
+        toast.error(errorMsg);
+        return;
+      }
 
       toast.success("Welcome back!");
-      console.log("User data after login:", data); 
-      if(data?.user?.role === "") {
-        router.replace("/role-selector");
+      const userRole = data?.user?.role;
+      if (!userRole) {
+        router.push("/role-selector");
       } else {
-        router.replace("/")
+        router.push("/");
       }
     } catch (err) {
-      setErrors({ general: err.message || "Invalid credentials" });
-      toast.error(err.message || "Invalid credentials");
+      const errorMsg = err.message || "Invalid credentials";
+      setErrors({ general: errorMsg });
+      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -177,7 +183,7 @@ export default function LoginPage() {
               marginBottom: "16px",
             }}
           >
-            A Reader's Sanctuary
+            A Reader&apos;s Sanctuary
           </span>
           <blockquote
             style={{
@@ -190,7 +196,7 @@ export default function LoginPage() {
               marginBottom: "24px",
             }}
           >
-            "A room without books is like a body without a soul."
+            &quot;A room without books is like a body without a soul.&quot;
           </blockquote>
           <cite
             style={{

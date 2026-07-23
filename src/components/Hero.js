@@ -45,7 +45,7 @@ export default function Hero() {
             <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-gold/30 bg-gold-dim px-4 py-1.5 backdrop-blur-md shadow-[0_2px_16px_rgba(201,169,110,0.12)]">
               <span className="flex h-1.5 w-1.5 rounded-full bg-gold animate-pulse" />
               <span className="text-[0.68rem] font-bold tracking-[0.2em] text-gold uppercase">
-                A Reader's Sanctuary
+                A Reader&apos;s Sanctuary
               </span>
               <span className="text-white/20">•</span>
               <span className="text-[0.72rem] font-medium text-ink-muted">

@@ -43,46 +43,44 @@ export default function SignupPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     setIsSubmitting(true);
+    setErrors({});
     try {
       const formValues = new FormData(e.currentTarget);
       const payload = Object.fromEntries(formValues.entries());
-      console.log("Submitting signup data:", payload);
-      const { data, error } = await authClient.signUp.email({
-        name: payload.fullName, // required
-        email: payload.email, // required
-        password: payload.confirmPassword, // required
-        role: payload.role, // optional, default is "reader"
-        // image: "https://example.com/image.png",
-        callbackURL: "/",
-      });
+      // console.log("Submitting signup data:", payload);
+      
+      const signupRole = payload.role || formData.role || "";
+      const signupPayload = {
+        name: payload.fullName,
+        email: payload.email,
+        password: payload.confirmPassword,
+      };
+      if (signupRole) {
+        signupPayload.role = signupRole;
+      }
 
-      // const res = await fetch("/api/auth/register", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     fullName: payload.fullName || formData.fullName,
-      //     email: payload.email || formData.email,
-      //     password: payload.password || formData.password,
-      //     role: payload.role || formData.role,
-      //   }),
-      // });
+      const { data, error } = await authClient.signUp.email(signupPayload);
 
       if (error) {
-        throw new Error(error.message || "Registration failed");
+        const errorMsg = error.message || "Registration failed";
+        setErrors({ general: errorMsg });
+        toast.error(errorMsg);
+        return;
       }
-    toast.success(`Success! Please Login to continue.`);
+
+      toast.success("Account created successfully!");
+      const userRole = data?.user?.role || signupRole;
+      if (!userRole) {
+        router.push("/role-selector");
+      } else {
+        router.push("/");
+      }
     } catch (err) {
-      setErrors({ general: err.message || "Registration failed" });
-      toast.error(err.message || "Registration failed");
+      const errorMsg = err.message || "Registration failed";
+      setErrors({ general: errorMsg });
+      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            router.push("/login"); // redirect to login page
-          },
-        },
-      });
     }
   };
 
@@ -218,7 +216,7 @@ export default function SignupPage() {
               marginBottom: "24px",
             }}
           >
-            "Books are a uniquely portable magic."
+            &quot;Books are a uniquely portable magic.&quot;
           </blockquote>
           <cite
             style={{

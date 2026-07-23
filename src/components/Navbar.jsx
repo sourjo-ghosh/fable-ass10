@@ -51,11 +51,12 @@ export default function Navbar() {
     };
   }, []);
 
-  // Close menus on route change
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setUserDropdownOpen(false);
     setMobileOpen(false);
-  }, [pathname]);
+  }
 
   const isActive = (href) => {
     if (href === "/") return pathname === "/";
