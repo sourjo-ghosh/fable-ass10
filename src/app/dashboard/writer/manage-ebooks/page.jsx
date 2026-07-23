@@ -1,13 +1,18 @@
 import Link from "next/link";
 import WriterPageHeader from "@/components/dashboard/WriterPageHeader";
 import { FaPen, FaPlus, FaTrash } from "react-icons/fa6";
+import { AllEbook } from "@/lib/actions/getActions/allEbooks";
 
+const res = await  AllEbook();
 const ebooks = [
   ["A House of Glass", "$12.50", "Published"],
   ["The Paper Garden", "$9.99", "Unpublished"],
   ["A Map of Stars", "$14.00", "Published"],
 ];
 
+console.log(res?.data?.result)
+console.log(res)
+console.log(ebooks)
 export default function WriterEbooksPage() {
   return (
     <main className="mx-auto max-w-7xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
