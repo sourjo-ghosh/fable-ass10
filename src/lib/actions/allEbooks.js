@@ -1,9 +1,9 @@
 "use server";
 
-export async function AllEbook() {
+export async function AllEbook({UserId, UserEmail}) {
   try {
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/all-ebook`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/all-ebook?email=${UserEmail}&id=${UserId}`);
     if (!res.ok) {
       const errorText = await res.text();
       console.error("something went wrong");

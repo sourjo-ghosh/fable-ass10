@@ -3,7 +3,6 @@
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   FaArrowLeft,
   FaBookOpen,
@@ -13,12 +12,11 @@ import {
   FaTag,
   FaShareNodes
 } from "react-icons/fa6";
-import { GetEbookById, GetALlEbooks } from "@/lib/actions/Ebooks";
+import { getEbookById } from "@/lib/actions/getEbookById";
 import toast from "react-hot-toast";
 
 export default function EbookDetailPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
-  const router = useRouter();
   const id = params.id;
 
   const [ebook, setEbook] = useState(null);
@@ -27,15 +25,15 @@ export default function EbookDetailPage({ params: paramsPromise }) {
 
   useEffect(() => {
     async function loadEbook() {
+      if (!id) return;
       setLoading(true);
       setError(null);
       try {
-        // Try fetching single ebook by ID first using GetEbookById action
-        const res = await GetEbookById({ id });
-        if (res?.data) {
+        const res = await getEbookById(id);
+        if (res?.success && res?.data) {
           setEbook(res.data);
         } else {
-          setError("Ebook not found in database.");
+          setError(res?.error || "Ebook not found in database.");
         }
       } catch (err) {
         console.error("Failed to load ebook detail:", err);
@@ -44,9 +42,7 @@ export default function EbookDetailPage({ params: paramsPromise }) {
         setLoading(false);
       }
     }
-    if (id) {
-      loadEbook();
-    }
+    loadEbook();
   }, [id]);
 
   if (loading) {
@@ -87,7 +83,6 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   return (
     <main className="min-h-screen bg-bg-deep text-ink pt-28 pb-20 px-4 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-5xl">
-        {/* Back Link */}
         <Link
           href="/all-ebooks"
           className="inline-flex items-center gap-2 text-xs font-semibold text-ink-muted hover:text-gold no-underline transition mb-8"

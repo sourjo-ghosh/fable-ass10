@@ -40,7 +40,7 @@ export default function AllEbooksPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await GetALlEbooks();
+      const res = await GetALlEbooks({});
       if (res?.data && Array.isArray(res.data)) {
         setEbooks(res.data);
       } else if (res?.error) {

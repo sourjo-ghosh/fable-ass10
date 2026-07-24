@@ -7,8 +7,17 @@ import { FaPen, FaPlus, FaTrash, FaRotateRight, FaTriangleExclamation, FaXmark }
 import { GetALlEbooks } from "@/lib/actions/Ebooks";
 import { DeleteEbook } from "@/lib/actions/deleteActions/deleteEbook";
 import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
+import { AllEbook } from "@/lib/actions/allEbooks";
 
 export default function WriterEbooksPage() {
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const UserId = session?.user.id;
+  const UserEmail = session?.user.email;
+  console.log("user id", UserId)
+  console.log("User email", UserEmail)
+  console.log("user data form manage ebook",user)
   const [ebooks, setEbooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +28,7 @@ export default function WriterEbooksPage() {
   const fetchEbooks = async () => {
     setLoading(true);
     try {
-      const res = await GetALlEbooks();
+      const res = await AllEbook({ UserId, UserEmail });
       setEbooks(res?.data || []);
     } catch (err) {
       console.error("Failed to fetch ebooks:", err);
