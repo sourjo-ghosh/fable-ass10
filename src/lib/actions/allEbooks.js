@@ -16,7 +16,7 @@ export async function AllEbook() {
     const result = await res.json();
 
     return {
-      data: result,
+      data: result.data,
     };
   } catch (error) {
     console.error("allEbooks action error:", error);

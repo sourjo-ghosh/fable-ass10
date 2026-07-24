@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/browse", label: "Catalogue" },
+  { href: "/all-ebooks", label: "All Ebook" },
 ];
 
 export default function Navbar() {
