@@ -29,8 +29,6 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   const [bookmarked, setBookmarked] = useState(false);
   const { data: session } = authClient.useSession();
   const userId = session?.user?.id;
-  // console.log(user);
-
   useEffect(() => {
     async function loadEbook() {
       if (!id) return;
@@ -78,8 +76,6 @@ export default function EbookDetailPage({ params: paramsPromise }) {
 
   const UploadedTime = new Date(ebook.UploadedDate).toDateString();
   const handleBookMark = async (ebookId) => {
-    console.log(ebookId, "ebook id");
-    console.log(userId, "user id");
     try {
       if(!userId && ebookId){
         toast.error("Login first");

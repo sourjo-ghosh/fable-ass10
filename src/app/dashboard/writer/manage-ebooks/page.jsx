@@ -3,21 +3,25 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import WriterPageHeader from "@/components/dashboard/WriterPageHeader";
-import { FaPen, FaPlus, FaTrash, FaRotateRight, FaTriangleExclamation, FaXmark } from "react-icons/fa6";
+import {
+  FaPen,
+  FaPlus,
+  FaTrash,
+  FaRotateRight,
+  FaTriangleExclamation,
+  FaXmark,
+} from "react-icons/fa6";
 import { GetALlEbooks } from "@/lib/actions/Ebooks";
 import { DeleteEbook } from "@/lib/actions/deleteActions/deleteEbook";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 import { AllEbook } from "@/lib/actions/allEbooks";
+import { PublishUnpublish } from "@/lib/actions/editActions/publish-unpublish";
 
 export default function WriterEbooksPage() {
   const { data: session } = authClient.useSession();
-  const user = session?.user;
   const UserId = session?.user.id;
   const UserEmail = session?.user.email;
-  console.log("user id", UserId)
-  console.log("User email", UserEmail)
-  console.log("user data form manage ebook",user)
   const [ebooks, setEbooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,7 +57,9 @@ export default function WriterEbooksPage() {
       const result = await DeleteEbook(confirmDelete.id);
       if (result?.success) {
         // Optimistically remove from list
-        setEbooks((prev) => prev.filter((b) => (b._id || b.id) !== confirmDelete.id));
+        setEbooks((prev) =>
+          prev.filter((b) => (b._id || b.id) !== confirmDelete.id),
+        );
         toast.success(`"${confirmDelete.title}" deleted successfully.`);
       } else {
         toast.error(result?.error || "Failed to delete ebook.");
@@ -69,7 +75,25 @@ export default function WriterEbooksPage() {
   const handleDeleteCancel = () => {
     if (!deleting) setConfirmDelete(null);
   };
-
+  const handlePublishUnPublish = async (id) => {
+    try {
+      const result = await PublishUnpublish(id, UserId);
+      if (result?.success) {
+        setEbooks((prev) =>
+          prev.map((book) =>
+            (book._id || book.id) === id
+              ? { ...book, isPublished: !book.isPublished }
+              : book,
+          ),
+        );
+        toast.success(result?.data?.message || "Status updated!");
+      } else {
+        toast.error(result?.error || "Failed to update.");
+      }
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
   return (
     <>
       <main className="mx-auto max-w-7xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
@@ -87,7 +111,9 @@ export default function WriterEbooksPage() {
               title="Refresh"
               className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-bg-card px-3 py-2.5 text-xs font-medium text-ink-muted transition hover:text-gold hover:border-gold/30 disabled:opacity-50"
             >
-              <FaRotateRight className={`h-3.5 w-3.5 ${loading ? "animate-spin text-gold" : ""}`} />
+              <FaRotateRight
+                className={`h-3.5 w-3.5 ${loading ? "animate-spin text-gold" : ""}`}
+              />
             </button>
             <Link
               href="/dashboard/writer/add-ebook"
@@ -134,8 +160,12 @@ export default function WriterEbooksPage() {
                 ))
               ) : ebooks.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-16 text-center text-sm text-ink-muted">
-                    No ebooks found. Click &quot;Add ebook&quot; to create your first one.
+                  <td
+                    colSpan={4}
+                    className="px-6 py-16 text-center text-sm text-ink-muted"
+                  >
+                    No ebooks found. Click &quot;Add ebook&quot; to create your
+                    first one.
                   </td>
                 </tr>
               ) : (
@@ -182,6 +212,7 @@ export default function WriterEbooksPage() {
 
                           {/* Publish toggle (placeholder — wire to your publish API) */}
                           <button
+                            onClick={() => handlePublishUnPublish(id)}
                             type="button"
                             className="rounded-lg border border-gold/25 bg-gold-dim px-3 py-2 text-xs font-medium text-gold transition-colors hover:bg-gold/20"
                           >
@@ -238,8 +269,14 @@ export default function WriterEbooksPage() {
             </h2>
             <p className="mt-2 text-sm text-ink-muted text-center leading-relaxed">
               Are you sure you want to delete{" "}
-              <strong className="text-ink">&quot;{confirmDelete.title}&quot;</strong>?{" "}
-              This action <span className="text-red-400 font-semibold">cannot be undone</span>.
+              <strong className="text-ink">
+                &quot;{confirmDelete.title}&quot;
+              </strong>
+              ? This action{" "}
+              <span className="text-red-400 font-semibold">
+                cannot be undone
+              </span>
+              .
             </p>
 
             {/* Actions */}

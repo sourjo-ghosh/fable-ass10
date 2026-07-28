@@ -46,9 +46,7 @@ export default function SignupPage() {
     setErrors({});
     try {
       const formValues = new FormData(e.currentTarget);
-      const payload = Object.fromEntries(formValues.entries());
-      // console.log("Submitting signup data:", payload);
-      
+      const payload = Object.fromEntries(formValues.entries());      
       const signupRole = payload.role || formData.role || "";
       const signupPayload = {
         name: payload.fullName,

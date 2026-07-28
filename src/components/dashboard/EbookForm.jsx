@@ -38,8 +38,6 @@ export default function EbookForm() {
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  console.log(user)
-
   const handleImageChange = (e) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
