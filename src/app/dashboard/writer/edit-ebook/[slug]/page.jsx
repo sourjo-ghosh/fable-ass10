@@ -179,6 +179,9 @@ export default function EditEbookPage({ params: paramsPromise }) {
     info: "text-gold",
   };
 
+
+  
+
   return (
     <main className="mx-auto max-w-6xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
       <WriterPageHeader

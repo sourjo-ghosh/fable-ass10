@@ -80,6 +80,8 @@ export default function EbookForm() {
         authorId: user?.id || null,
         authorEmail: user?.email || null,
         isPublished: false,
+        UploadedDate: new Date(),
+        status: "Available"
       };
 
       const result = await AddEbook(bookData);

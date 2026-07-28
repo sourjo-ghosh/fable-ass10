@@ -10,10 +10,13 @@ import {
   FaCartShopping,
   FaUserPen,
   FaTag,
-  FaShareNodes
+  FaShareNodes,
 } from "react-icons/fa6";
 import { getEbookById } from "@/lib/actions/getEbookById";
 import toast from "react-hot-toast";
+import { BsCalendarDate } from "react-icons/bs";
+import { CiBookmark } from "react-icons/ci";
+import { authClient } from "@/lib/auth-client";
 
 export default function EbookDetailPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
@@ -22,6 +25,9 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   const [ebook, setEbook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { data: session } = authClient.useSession();
+  const userId = session?.user?.id;
+  // console.log(user);
 
   useEffect(() => {
     async function loadEbook() {
@@ -44,26 +50,40 @@ export default function EbookDetailPage({ params: paramsPromise }) {
     }
     loadEbook();
   }, [id]);
-
   if (loading) {
     return (
       <main className="min-h-screen bg-bg-deep text-ink pt-32 pb-20 px-6 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold border-t-transparent" />
-          <p className="text-sm text-ink-muted">Fetching ebook from server...</p>
+          <p className="text-sm text-ink-muted">
+            Fetching ebook from server...
+          </p>
         </div>
       </main>
     );
   }
 
+  const UploadedTime = new Date(ebook.UploadedDate).toDateString();
+  const handleBookMark = async (ebookId) => {
+    console.log(ebookId, 'ebook id');
+    console.log(userId, 'user id');
+    
+  };
   if (error || !ebook) {
     return (
       <main className="min-h-screen bg-bg-deep text-ink pt-32 pb-20 px-6 text-center">
         <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-bg-card p-10">
           <FaBookOpen className="mx-auto h-12 w-12 text-gold/40 mb-4" />
-          <h1 className="font-serif text-2xl font-semibold text-ink">Ebook Not Found</h1>
-          <p className="mt-2 text-sm text-ink-muted">{error || "The requested ebook could not be found."}</p>
-          <Link href="/all-ebooks" className="btn-gold mt-6 inline-flex no-underline text-xs px-6 py-2.5">
+          <h1 className="font-serif text-2xl font-semibold text-ink">
+            Ebook Not Found
+          </h1>
+          <p className="mt-2 text-sm text-ink-muted">
+            {error || "The requested ebook could not be found."}
+          </p>
+          <Link
+            href="/all-ebooks"
+            className="btn-gold mt-6 inline-flex no-underline text-xs px-6 py-2.5"
+          >
             Back to Catalogue
           </Link>
         </div>
@@ -72,13 +92,14 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   }
 
   const author = ebook.authorName || ebook.writerName || "Fable Author";
-  const isPurchased = ebook.isPurchased || ebook.purchased || ebook.status === "sold";
+  const isPurchased =
+    ebook.isPurchased || ebook.purchased || ebook.status === "sold";
   const priceDisplay =
     typeof ebook.price === "number"
       ? `$${ebook.price.toFixed(2)}`
       : ebook.price
-      ? `$${ebook.price}`
-      : "Free";
+        ? `$${ebook.price}`
+        : "Free";
 
   return (
     <main className="min-h-screen bg-bg-deep text-ink pt-28 pb-20 px-4 sm:px-6 lg:px-12">
@@ -121,10 +142,11 @@ export default function EbookDetailPage({ params: paramsPromise }) {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="inline-flex items-center gap-1 rounded-full border border-gold/30 bg-gold-dim px-3 py-1 text-xs font-bold text-gold uppercase tracking-wider">
-                  <FaTag className="text-[0.65rem]" /> {ebook.genre || "General"}
+                  <FaTag className="text-[0.65rem]" />{" "}
+                  {ebook.genre || "General"}
                 </span>
                 <span className="flex items-center gap-1 text-xs font-semibold text-gold">
-                  <FaStar /> 4.8
+                  <BsCalendarDate /> {UploadedTime}
                 </span>
               </div>
 
@@ -134,14 +156,30 @@ export default function EbookDetailPage({ params: paramsPromise }) {
 
               <div className="flex items-center gap-2 text-sm text-ink-muted mb-6 pb-6 border-b border-white/[0.07]">
                 <FaUserPen className="text-gold" />
-                <span>Written by <strong className="text-ink">{author}</strong></span>
+                <span>
+                  Written by{" "}
+                  <strong className="text-ink hover:underline">{author}</strong>
+                </span>
                 {ebook.authorEmail && (
-                  <span className="text-xs text-ink-faint">({ebook.authorEmail})</span>
+                  <span className="text-xs text-ink-faint">
+                    ({ebook.authorEmail})
+                  </span>
                 )}
               </div>
 
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gold mb-2">
+                  Book Status
+                </h3>
+                <p className="text-sm sm:text-base leading-relaxed text-ink-muted bg-bg-deep/60 p-4 rounded-2xl border border-white/[0.05]">
+                  {ebook.status}
+                </p>
+              </div>
+              <br />
               <div className="mb-6">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gold mb-2">Book Content / Preview</h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gold mb-2">
+                  Book Content / Preview
+                </h3>
                 <p className="text-sm sm:text-base leading-relaxed text-ink-muted bg-bg-deep/60 p-4 rounded-2xl border border-white/[0.05]">
                   {ebook.content || "No content preview available."}
                 </p>
@@ -151,7 +189,9 @@ export default function EbookDetailPage({ params: paramsPromise }) {
             <div className="pt-6 border-t border-white/[0.07] flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <span className="text-xs text-ink-faint block">Price</span>
-                <span className="font-serif text-3xl font-bold text-gold">{priceDisplay}</span>
+                <span className="font-serif text-3xl font-bold text-gold">
+                  {priceDisplay}
+                </span>
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -171,6 +211,15 @@ export default function EbookDetailPage({ params: paramsPromise }) {
                   title="Share"
                 >
                   <FaShareNodes />
+                </button>
+                <button
+                  onClick={() => {
+                    handleBookMark(ebook._id);
+                  }}
+                  className="rounded-xl border border-white/10 bg-white/5 p-3 text-ink-muted hover:text-gold hover:border-gold/30 transition"
+                  title="Share"
+                >
+                  <CiBookmark />
                 </button>
               </div>
             </div>
