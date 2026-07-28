@@ -11,6 +11,7 @@ import {
   FaUserPen,
   FaTag,
   FaShareNodes,
+  FaBookmark,
 } from "react-icons/fa6";
 import { getEbookById } from "@/lib/actions/getEbookById";
 import toast from "react-hot-toast";
@@ -25,6 +26,7 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   const [ebook, setEbook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bookmarked, setBookmarked] = useState(false);
   const { data: session } = authClient.useSession();
   const userId = session?.user?.id;
   // console.log(user);
@@ -50,6 +52,17 @@ export default function EbookDetailPage({ params: paramsPromise }) {
     }
     loadEbook();
   }, [id]);
+  useEffect(() => {
+    if (!userId || !ebook?._id) return;
+    const checkIsBookmarked = async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/check/${userId}/${ebook._id}`,
+      );
+      const results = await res.json();
+      setBookmarked(results.bookmarked);
+    };
+    checkIsBookmarked();
+  },  [userId, ebook?._id]);
   if (loading) {
     return (
       <main className="min-h-screen bg-bg-deep text-ink pt-32 pb-20 px-6 flex items-center justify-center">
@@ -65,9 +78,35 @@ export default function EbookDetailPage({ params: paramsPromise }) {
 
   const UploadedTime = new Date(ebook.UploadedDate).toDateString();
   const handleBookMark = async (ebookId) => {
-    console.log(ebookId, 'ebook id');
-    console.log(userId, 'user id');
-    
+    console.log(ebookId, "ebook id");
+    console.log(userId, "user id");
+    try {
+      if(!userId && ebookId){
+        toast.error("Login first");
+        return;
+      }
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/toggle-bookmark/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: ebookId }),
+        },
+      );
+      const results = await res.json();
+      if (results.bookmarked) {
+        toast.success("Added Bookmark");
+        setBookmarked(true);
+      } else {
+        toast.error("Remove Bookmark");
+        setBookmarked(false);
+      }
+    } catch (err) {
+      console.error("Failed to toggle bookmark:", err);
+      toast.error("Failed to toggle bookmark");
+    }
   };
   if (error || !ebook) {
     return (
@@ -217,9 +256,9 @@ export default function EbookDetailPage({ params: paramsPromise }) {
                     handleBookMark(ebook._id);
                   }}
                   className="rounded-xl border border-white/10 bg-white/5 p-3 text-ink-muted hover:text-gold hover:border-gold/30 transition"
-                  title="Share"
+                  title="Bookmark"
                 >
-                  <CiBookmark />
+                  {bookmarked ? <FaBookmark /> : <CiBookmark />}
                 </button>
               </div>
             </div>
