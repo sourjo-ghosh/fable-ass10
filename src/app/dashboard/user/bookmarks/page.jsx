@@ -8,7 +8,9 @@ export default async function BookmarksPage() {
     headers: await headers(),
   });
   const userId = session?.user.id;
-  const data = await getBookmarkBooks(userId);
+  const data = await getBookmarkBooks({userId});
+  console.log(data.length)
+  console.log(userId)
   return (
     <LibraryGallery
       title="Bookmarks"
