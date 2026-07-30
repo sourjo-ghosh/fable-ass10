@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FaCloudArrowUp, FaImage, FaCheck, FaBookOpen, FaArrowLeft } from "react-icons/fa6";
 import WriterPageHeader from "@/components/dashboard/WriterPageHeader";
-import { getEbookById } from "@/lib/actions/getEbookById";
-import { updateEbook } from "@/lib/actions/editActions/updateEbook";
+import { getEbookById } from "@/lib/actions/get/getEbookById";
+import { updateEbook } from "@/lib/actions/writer/updateEbook";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 

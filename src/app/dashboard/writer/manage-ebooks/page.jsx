@@ -11,12 +11,12 @@ import {
   FaTriangleExclamation,
   FaXmark,
 } from "react-icons/fa6";
-import { GetALlEbooks } from "@/lib/actions/Ebooks";
-import { DeleteEbook } from "@/lib/actions/deleteActions/deleteEbook";
+import { GetALlEbooks } from "@/lib/actions/get/getAllEbooks";
+import { DeleteEbook } from "@/lib/actions/writer/deleteEbook";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
-import { AllEbook } from "@/lib/actions/allEbooks";
-import { PublishUnpublish } from "@/lib/actions/editActions/publish-unpublish";
+import { AllEbook } from "@/lib/actions/writer/getWriterEbooks";
+import { PublishUnpublish } from "@/lib/actions/writer/togglePublish";
 
 export default function WriterEbooksPage() {
   const { data: session } = authClient.useSession();

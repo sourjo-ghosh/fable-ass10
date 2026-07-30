@@ -1,5 +1,5 @@
 import LibraryGallery from "@/components/dashboard/LibraryGallery";
-import { getBookmarkBooks } from "@/lib/actions/getBookmarks";
+import { getBookmarkBooks } from "@/lib/actions/user/getBookmarks";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -9,8 +9,6 @@ export default async function BookmarksPage() {
   });
   const userId = session?.user.id;
   const data = await getBookmarkBooks({userId});
-  console.log(data.length)
-  console.log(userId)
   return (
     <LibraryGallery
       title="Bookmarks"

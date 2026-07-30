@@ -9,7 +9,7 @@ import {
   FaRotateRight,
   FaStar,
 } from "react-icons/fa6";
-import { GetALlEbooks } from "@/lib/actions/Ebooks";
+import { GetALlEbooks } from "@/lib/actions/get/getAllEbooks";
 
 // Curated genre badge styling palette
 const GENRE_PALETTES = {

@@ -1,15 +1,18 @@
 "use server";
 
-export async function EditEbook(id, ebookData) {
+// Merged from editBooks.js (EditEbook) + updateEbook.js (updateEbook)
+// Both called the same API: PUT /api/edit-ebook/:id
+// Keeping validation from EditEbook and clean structure from updateEbook
+export async function updateEbook(id, ebookData) {
   try {
-    const { coverImage, title, content, price, genre } = ebookData;
-
     if (!id) {
       return {
         success: false,
         error: "Ebook ID is required to update.",
       };
     }
+
+    const { coverImage, title, content, price, genre } = ebookData;
 
     if (!title || !content || price === undefined || !genre) {
       return {
@@ -53,7 +56,7 @@ export async function EditEbook(id, ebookData) {
       data: result,
     };
   } catch (error) {
-    console.error("editEbook action error:", error);
+    console.error("updateEbook action error:", error);
     return {
       success: false,
       error:
@@ -61,4 +64,8 @@ export async function EditEbook(id, ebookData) {
         "Could not connect to backend server. Make sure your server on port 8000 is running.",
     };
   }
+}
+
+export async function EditEbook(id, ebookData) {
+  return updateEbook(id, ebookData);
 }

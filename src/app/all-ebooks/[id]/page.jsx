@@ -13,7 +13,7 @@ import {
   FaShareNodes,
   FaBookmark,
 } from "react-icons/fa6";
-import { getEbookById } from "@/lib/actions/getEbookById";
+import { getEbookById } from "@/lib/actions/get/getEbookById";
 import toast from "react-hot-toast";
 import { BsCalendarDate } from "react-icons/bs";
 import { CiBookmark } from "react-icons/ci";
@@ -29,6 +29,49 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   const [bookmarked, setBookmarked] = useState(false);
   const { data: session } = authClient.useSession();
   const userId = session?.user?.id;
+  const [status, setStatus] = useState("Found");
+  // useEffect(() => {
+  //   async function loadEbook() {
+  //     if (!id) return;
+  //     setLoading(true);
+  //     setError(null);
+  //     try {
+  //       const interval = setInterval(async () => {
+  //         const res = await getEbookById(id);
+
+  //         if (!res?.success) {
+  //           setStatus("deleted");
+  //           return;
+  //         }
+
+  //         if (!res.data.isPublished) {
+  //           setStatus("unpublished");
+  //         }
+  //         if (res.success) {
+  //           setEbook(res.data);
+  //           setStatus("found");
+  //         }
+  //       }, 10000);
+  //       return () => clearInterval(interval);
+  //       // const res = await getEbookById(id);
+  //       // if (res?.success && res?.data) {
+  //       //   if (!res.data.isPublished) {
+  //       //     setStatus("unpublished");
+  //       //   } else {
+  //       //   }
+  //       // } else {
+  //       //   setStatus("deleted");
+  //       // }
+  //     } catch (err) {
+  //       console.error("Failed to load ebook detail:", err);
+  //       setError(err.message || "Could not connect to server.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  //   loadEbook();
+  // }, [id]);
+  // useEffect 1 — শুধু initial load (একবার চলবে)
   useEffect(() => {
     async function loadEbook() {
       if (!id) return;
@@ -37,9 +80,14 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       try {
         const res = await getEbookById(id);
         if (res?.success && res?.data) {
-          setEbook(res.data);
+          if (!res.data.isPublished) {
+            setStatus("unpublished");
+          } else {
+            setEbook(res.data);
+            setStatus("found");
+          }
         } else {
-          setError(res?.error || "Ebook not found in database.");
+          setStatus("deleted");
         }
       } catch (err) {
         console.error("Failed to load ebook detail:", err);
@@ -49,6 +97,28 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       }
     }
     loadEbook();
+  }, [id]);
+  useEffect(() => {
+    if (!id) return;
+
+    const interval = setInterval(async () => {
+      const res = await getEbookById(id);
+
+      if (!res?.success) {
+        setStatus("deleted");
+        return;
+      }
+
+      if (!res.data.isPublished) {
+        setStatus("unpublished");
+        return;
+      }
+
+      setEbook(res.data);
+      setStatus("found");
+    }, 10000);
+
+    return () => clearInterval(interval); 
   }, [id]);
   useEffect(() => {
     if (!userId || !ebook?._id) return;
@@ -73,7 +143,22 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       </main>
     );
   }
-
+  if (status === "deleted")
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <h2 className="text-2xl font-semibold text-ink">Ebook Not Found</h2>
+        <p className="text-ink-muted">This ebook has been removed.</p>
+        <Link href="/all-ebooks">Browse other ebooks</Link>
+      </div>
+    );
+  if (status === "unpublished")
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <h2 className="text-2xl font-semibold text-ink">No Longer Available</h2>
+        <p className="text-ink-muted">This ebook has been unpublished.</p>
+        <Link href="/all-ebooks">Browse other ebooks</Link>
+      </div>
+    );
   const UploadedTime = new Date(ebook.UploadedDate).toDateString();
   const handleBookMark = async (ebookId) => {
     try {
@@ -104,9 +189,7 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       toast.error("Failed to toggle bookmark");
     }
   };
-  const handleBuyBook = async (ebookId) => {
-    console.log(ebookId);
-  };
+  const handleBuyBook = async (ebookId) => {};
   if (error || !ebook) {
     return (
       <main className="min-h-screen bg-bg-deep text-ink pt-32 pb-20 px-6 text-center">

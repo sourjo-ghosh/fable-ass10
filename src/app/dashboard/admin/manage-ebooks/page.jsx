@@ -1,9 +1,8 @@
 "use client";
 import AdminTableHeader from "@/components/dashboard/AdminTableHeader";
-import { DeleteEbookAdmin } from "@/lib/actions/deleteActions/deleteEbookAdmin";
-import { PublishUnpublishAdmin } from "@/lib/actions/editActions/publishUnPublishEbookAdmin";
-import { AllEbooksAdmin } from "@/lib/actions/getAllEbookAdmin";
-import { AllUsers } from "@/lib/actions/getAllUsers";
+import { DeleteEbookAdmin } from "@/lib/actions/admin/deleteEbook";
+import { PublishUnpublishAdmin } from "@/lib/actions/admin/togglePublish";
+import { AllEbooksAdmin } from "@/lib/actions/admin/getAllEbooks";
 import { authClient } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -13,13 +12,6 @@ import {
   FaTriangleExclamation,
   FaXmark,
 } from "react-icons/fa6";
-
-// const ebooks = [
-//   ["The Silent Patient", "Alex Michaelides", "$14.99", "Published"],
-//   ["A House of Glass", "Noah Williams", "$12.50", "Draft"],
-//   ["Circe", "Madeline Miller", "$15.50", "Published"],
-//   ["Moonlit Roads", "Mia Johnson", "$9.99", "Unpublished"],
-// ];
 
 export default function ManageEbooksPage() {
   const [loading, setLoading] = useState(true);
@@ -47,7 +39,6 @@ export default function ManageEbooksPage() {
   const handlePublishUnPublish = async (ebookId) => {
     try {
       const result = await PublishUnpublishAdmin(ebookId, adminId);
-      console.log(result);
       if (result?.success) {
         setEbooks((prev) =>
           prev.map((book) =>
@@ -66,14 +57,12 @@ export default function ManageEbooksPage() {
   };
   const handleDeleteClick = (id, tittle) => {
     setConfirmDelete({ id, tittle });
-    console.log(confirmDelete);
   };
   const handleDeleteConfirm = async () => {
     if (!confirmDelete?.id) return;
     setDeleting(true);
     try {
       const result = await DeleteEbookAdmin(confirmDelete.id, adminId);
-      console.log(result);
       if (result?.success) {
         // Optimistically remove from list
         setEbooks((prev) =>

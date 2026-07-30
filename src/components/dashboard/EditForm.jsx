@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaCloudArrowUp, FaImage, FaCheck } from "react-icons/fa6";
-import { EditEbook } from "@/lib/actions/editActions/editBooks";
+import { EditEbook } from "@/lib/actions/writer/updateEbook";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 

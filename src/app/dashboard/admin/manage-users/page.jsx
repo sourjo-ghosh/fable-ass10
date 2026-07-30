@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import AdminTableHeader from "@/components/dashboard/AdminTableHeader";
-import { AllUsers } from "@/lib/actions/getAllUsers";
-import { BanUnbanUser } from "@/lib/actions/editActions/ban-unban";
-import { ChangeUserRole } from "@/lib/actions/editActions/change-role";
+import { AllUsers } from "@/lib/actions/admin/getAllUsers";
+import { BanUnbanUser } from "@/lib/actions/admin/banUnban";
+import { ChangeUserRole } from "@/lib/actions/admin/changeRole";
 import { authClient } from "@/lib/auth-client";
 import {
   FaRotateRight,

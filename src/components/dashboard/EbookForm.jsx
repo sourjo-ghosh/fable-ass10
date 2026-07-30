@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaCloudArrowUp, FaImage } from "react-icons/fa6";
-import { AddEbook } from "@/lib/actions/postActions/addEbook";
+import { AddEbook } from "@/lib/actions/writer/addEbook";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 

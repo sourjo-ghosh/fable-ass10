@@ -24,8 +24,6 @@ export async function proxy(request) {
         return NextResponse.next();
     }
     const isAllowed = pathname === myDashboard || pathname.startsWith(`${myDashboard}/`);
-    
-    console.log(request.url)
     if (!isAllowed) {
         return NextResponse.redirect(new URL(myDashboard, request.url));
     }

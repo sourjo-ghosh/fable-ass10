@@ -12,7 +12,7 @@ export const getBookmarkBooks = async ({userId}) => {
     } else {
       return {
         success: false,
-        error: `Server responded with status ${res.status}: ${errorText}`,
+        error: `Server responded with status ${res.status}`,
       };
     }
   } catch (error) {
