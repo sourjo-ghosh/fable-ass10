@@ -21,7 +21,7 @@ export async function ChangeUserRole(userId, role, adminId) {
     }
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/change-role/${adminId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/change-role/${adminId}`,
       {
         method: "PATCH",
         headers: {

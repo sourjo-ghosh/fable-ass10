@@ -60,7 +60,7 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       setBookmarked(results.bookmarked);
     };
     checkIsBookmarked();
-  },  [userId, ebook?._id]);
+  }, [userId, ebook?._id]);
   if (loading) {
     return (
       <main className="min-h-screen bg-bg-deep text-ink pt-32 pb-20 px-6 flex items-center justify-center">
@@ -77,7 +77,7 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   const UploadedTime = new Date(ebook.UploadedDate).toDateString();
   const handleBookMark = async (ebookId) => {
     try {
-      if(!userId && ebookId){
+      if (!userId && ebookId) {
         toast.error("Login first");
         return;
       }
@@ -103,6 +103,9 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       console.error("Failed to toggle bookmark:", err);
       toast.error("Failed to toggle bookmark");
     }
+  };
+  const handleBuyBook = async (ebookId) => {
+    console.log(ebookId);
   };
   if (error || !ebook) {
     return (
@@ -230,12 +233,32 @@ export default function EbookDetailPage({ params: paramsPromise }) {
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
-                <button
-                  onClick={() => toast.success(`Purchased "${ebook.title}"!`)}
-                  className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
-                >
-                  <FaCartShopping /> Buy Now
-                </button>
+                {userId ? (
+                  // <button
+                  //   onClick={() => handleBuyBook(ebook._id)}
+                  //   className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
+                  // >
+                  //   <FaCartShopping /> Buy Now
+                  // </button>
+                  <form action="/api/payments" method="POST">
+                    <section>
+                      <button
+                        className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
+                        type="submit"
+                        role="link"
+                      >
+                        Checkout
+                      </button>
+                    </section>
+                  </form>
+                ) : (
+                  <button
+                    onClick={() => toast.error("Login First")}
+                    className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
+                  >
+                    <FaCartShopping /> Buy Now
+                  </button>
+                )}
 
                 <button
                   onClick={() => {

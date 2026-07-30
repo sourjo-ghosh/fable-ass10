@@ -1,10 +1,12 @@
 "use server";
 
-export async function AllUsers({ userId }) {
+export async function AllEbooksAdmin({ adminId }) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/all-users/${userId}`,
-      {cache: 'no-store'}
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/manage-ebook/${adminId}`,
+      {
+        cache: "no-store",
+      },
     );
     const result = await res.json();
     if (!result.success) {

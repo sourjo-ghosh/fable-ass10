@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -10,6 +11,36 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/all-ebooks", label: "All Ebook" },
 ];
+
+function UserAvatar({ user, size = "sm" }) {
+  const name = user?.name || user?.email || "U";
+  const initial = name[0].toUpperCase();
+  const sizeClass = size === "sm" ? "h-7 w-7 text-[0.75rem]" : "h-9 w-9 text-sm";
+
+  if (user?.image) {
+    return (
+      <span
+        className={`relative ${sizeClass} shrink-0 overflow-hidden rounded-full shadow-[0_2px_8px_rgba(201,169,110,0.3)]`}
+      >
+        <Image
+          src={user.image}
+          alt=""
+          fill
+          className="object-cover"
+          unoptimized
+        />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`flex ${sizeClass} shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-light font-bold text-bg-deep shadow-[0_2px_8px_rgba(201,169,110,0.3)]`}
+    >
+      {initial}
+    </span>
+  );
+}
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -137,14 +168,7 @@ export default function Navbar() {
                 aria-label="User menu"
                 className="group flex cursor-pointer items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1.5 pr-4 pl-2 text-sm font-medium text-ink transition-all duration-300 hover:border-gold/35 hover:bg-gold-dim focus:outline-none"
               >
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-light text-[0.75rem] font-bold text-bg-deep shadow-[0_2px_8px_rgba(201,169,110,0.3)]">
-                  {/* {user.name
-                    ? user.name[0].toUpperCase()
-                    : user.email
-                    ? user.email[0].toUpperCase()
-                    : "U"} */}
-                    joy
-                </div>
+                <UserAvatar user={user} size="sm" />
                 <span className="max-w-[130px] truncate text-xs font-medium tracking-wide text-ink">
                   {user.name || user.email?.split("@")[0] || "Account"}
                 </span>
@@ -173,15 +197,20 @@ export default function Navbar() {
                 >
                   {/* User summary inside popover */}
                   <div className="mb-1 border-b border-white/[0.08] px-3.5 py-3">
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-gold">
-                      Signed in as
-                    </p>
-                    <p className="mt-0.5 truncate text-sm font-medium text-ink">
-                      {user.name || "Reader"}
-                    </p>
-                    <p className="mt-0.5 truncate font-mono text-[0.75rem] text-ink-muted">
-                      {user.email}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <UserAvatar user={user} size="md" />
+                      <div className="min-w-0">
+                        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-gold">
+                          Signed in as
+                        </p>
+                        <p className="mt-0.5 truncate text-sm font-medium text-ink">
+                          {user.name || "Reader"}
+                        </p>
+                        <p className="mt-0.5 truncate font-mono text-[0.75rem] text-ink-muted">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* 1. My Profile */}
@@ -339,13 +368,7 @@ export default function Navbar() {
           {user ? (
             <div className="mt-4 flex flex-col gap-2 border-t border-white/[0.08] pt-4">
               <div className="mb-1 flex items-center gap-3 px-4 py-2">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-light text-sm font-bold text-bg-deep">
-                  {user.name
-                    ? user.name[0].toUpperCase()
-                    : user.email
-                    ? user.email[0].toUpperCase()
-                    : "U"}
-                </div>
+                <UserAvatar user={user} size="md" />
                 <div className="overflow-hidden">
                   <p className="truncate text-sm font-medium text-ink">
                     {user.name || "Reader"}

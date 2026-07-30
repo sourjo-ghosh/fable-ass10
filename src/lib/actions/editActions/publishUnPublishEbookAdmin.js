@@ -1,26 +1,22 @@
 "use server";
 
-// Ban or Unban a user — toggles ban status
-// Backend should: find user by userId, toggle banned field
-// Endpoint: PATCH /api/ban-user/:adminId
-// Body: { userId }
-export async function BanUnbanUser(userId, adminId) {
+export async function PublishUnpublishAdmin(ebookId, adminId) {
   try {
-    if (!userId) {
+    if (!ebookId) {
       return {
         success: false,
-        error: "User ID is required.",
+        error: "Ebook ID is required.",
       };
     }
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/ban-user/${adminId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/manage-ebook/publish-unpublish`,
       {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ebookId, adminId}),
         cache: "no-store",
       }
     );
@@ -29,7 +25,7 @@ export async function BanUnbanUser(userId, adminId) {
       const errorText = await res.text();
       return {
         success: false,
-        error: `Server error (${res.status}): ${errorText || "Failed to update user ban status."}`,
+        error: `Server error (${res.status}): ${errorText || "Failed to update ebook."}`,
       };
     }
 

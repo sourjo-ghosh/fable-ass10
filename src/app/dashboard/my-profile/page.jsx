@@ -30,7 +30,6 @@ async function uploadToImgBB(file) {
 }
 
 const roleLabels = {
-  reader: "Reader",
   user: "Reader",
   writer: "Writer",
   admin: "Admin",

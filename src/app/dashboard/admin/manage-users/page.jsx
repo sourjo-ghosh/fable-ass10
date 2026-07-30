@@ -52,8 +52,8 @@ export default function ManageUsersPage() {
         // Optimistically update the role in the list
         setUsers((prev) =>
           prev.map((u) =>
-            (u._id || u.id) === userId ? { ...u, role: newRole } : u
-          )
+            (u._id || u.id) === userId ? { ...u, role: newRole } : u,
+          ),
         );
         toast.success(result?.data?.message || "Role updated!");
       } else {
@@ -80,12 +80,12 @@ export default function ManageUsersPage() {
           prev.map((u) =>
             (u._id || u.id) === confirmBan.userId
               ? { ...u, banned: !u.banned }
-              : u
-          )
+              : u,
+          ),
         );
         toast.success(
           result?.data?.message ||
-            `User ${confirmBan.isBanned ? "unbanned" : "banned"} successfully.`
+            `User ${confirmBan.isBanned ? "unbanned" : "banned"} successfully.`,
         );
       } else {
         toast.error(result?.error || "Failed to update user status.");
@@ -106,12 +106,14 @@ export default function ManageUsersPage() {
     <>
       <main className="mx-auto max-w-7xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
         {/* Header */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <AdminTableHeader
-            title="Manage users"
-            subtitle="Update account roles and manage access across Fable."
-          />
-          <div className="flex items-center gap-2">
+        <div className="flex flex-row justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <AdminTableHeader
+              title="Manage users"
+              subtitle="Update account roles and manage access across Fable."
+            />
+          </div>
+          <div>
             <button
               onClick={fetchUsers}
               disabled={loading}
@@ -124,7 +126,6 @@ export default function ManageUsersPage() {
             </button>
           </div>
         </div>
-
         {/* Table */}
         <div className="mt-8 overflow-x-auto rounded-2xl border border-white/[0.07] bg-bg-card">
           <table className="w-full min-w-[760px] text-left">
@@ -181,9 +182,7 @@ export default function ManageUsersPage() {
                       key={userId}
                       className="transition-colors hover:bg-white/[0.02]"
                     >
-                      <td className="px-6 py-5 font-medium text-ink">
-                        {name}
-                      </td>
+                      <td className="px-6 py-5 font-medium text-ink">{name}</td>
                       <td className="px-6 py-5 text-sm text-ink-muted">
                         {email}
                       </td>
@@ -218,9 +217,7 @@ export default function ManageUsersPage() {
                       {/* Ban/Unban button */}
                       <td className="px-6 py-5">
                         <button
-                          onClick={() =>
-                            handleBanClick(userId, name, isBanned)
-                          }
+                          onClick={() => handleBanClick(userId, name, isBanned)}
                           type="button"
                           className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                             isBanned
