@@ -71,8 +71,14 @@ export default function LoginPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/role-selector",
+        // callbackURL: "/role-selector",
       });
+      const userRole = result?.data?.user?.role;
+      if (!userRole) {
+        router.push("/role-selector");
+      } else {
+        router.push("/"); 
+      }
     } catch (err) {
       setErrors({ general: err.message || "Unable to continue with Google" });
       toast.error(err.message || "Unable to continue with Google");
@@ -603,6 +609,4 @@ export default function LoginPage() {
       `}</style>
     </div>
   );
-
 }
-

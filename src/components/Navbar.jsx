@@ -138,11 +138,12 @@ export default function Navbar() {
                 className="group flex cursor-pointer items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1.5 pr-4 pl-2 text-sm font-medium text-ink transition-all duration-300 hover:border-gold/35 hover:bg-gold-dim focus:outline-none"
               >
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-light text-[0.75rem] font-bold text-bg-deep shadow-[0_2px_8px_rgba(201,169,110,0.3)]">
-                  {user.name
+                  {/* {user.name
                     ? user.name[0].toUpperCase()
                     : user.email
                     ? user.email[0].toUpperCase()
-                    : "U"}
+                    : "U"} */}
+                    joy
                 </div>
                 <span className="max-w-[130px] truncate text-xs font-medium tracking-wide text-ink">
                   {user.name || user.email?.split("@")[0] || "Account"}
@@ -185,7 +186,7 @@ export default function Navbar() {
 
                   {/* 1. My Profile */}
                   <Link
-                    href="/profile"
+                    href="/dashboard/my-profile"
                     role="menuitem"
                     onClick={() => setUserDropdownOpen(false)}
                     className="flex cursor-pointer items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-ink-muted no-underline transition-colors hover:bg-gold-dim hover:text-gold"
@@ -356,7 +357,7 @@ export default function Navbar() {
               </div>
 
               <Link
-                href="/profile"
+                href="/dashboard/my-profile"
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-ink-muted no-underline transition-colors hover:border-gold/30 hover:bg-gold-dim hover:text-gold"
               >

@@ -197,62 +197,7 @@ export default function Hero() {
       </div>
 
       {/* Floating Integrated Search Bar */}
-      <div className="relative z-[1] w-full border-t border-white/[0.08] bg-[rgba(12,11,10,0.88)] py-4 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-4 px-6 md:flex-row md:px-10">
-          
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (searchQuery.trim()) {
-                window.location.href = `/browse?q=${encodeURIComponent(searchQuery)}`;
-              }
-            }}
-            className="relative flex w-full items-center md:max-w-[480px]"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#a09880"
-              strokeWidth="2"
-              className="pointer-events-none absolute left-4 shrink-0"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
-            </svg>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by title, author, or keyword…"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 pr-24 pl-12 font-[inherit] text-sm text-ink outline-none transition-all placeholder:text-ink-faint focus:border-gold/40 focus:bg-white/[0.08]"
-            />
-            <button
-              type="submit"
-              className="absolute right-2.5 cursor-pointer rounded-lg bg-gradient-to-br from-gold to-gold-light px-4 py-1.5 text-xs font-bold text-bg-deep transition-transform active:scale-95"
-            >
-              Search
-            </button>
-          </form>
-
-          <div className="flex items-center gap-2 overflow-x-auto text-xs text-ink-muted">
-            <span className="shrink-0 font-bold tracking-wider text-gold uppercase text-[0.68rem]">
-              Trending Topics:
-            </span>
-            {["Dark Romance", "AI Sci-Fi", "High Fantasy", "Psychological Thriller"].map((topic) => (
-              <Link
-                key={topic}
-                href={`/browse?q=${encodeURIComponent(topic)}`}
-                className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-ink-muted no-underline transition-all hover:border-gold/30 hover:bg-gold-dim hover:text-gold"
-              >
-                {topic}
-              </Link>
-            ))}
-          </div>
-
-        </div>
-      </div>
+      
     </section>
   );
 }

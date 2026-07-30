@@ -20,7 +20,7 @@ export default function PurchaseHistoryPage() {
         href="/dashboard/user"
         className="inline-flex items-center gap-2 text-sm text-ink-muted no-underline hover:text-gold"
       >
-        <FaArrowLeft className="h-3 w-3" /> Profile
+        <FaArrowLeft className="h-3 w-3" /> Overview
       </Link>
       <div className="mt-8">
         <p className="text-xs font-bold tracking-[0.18em] text-gold uppercase">

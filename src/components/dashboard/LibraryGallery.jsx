@@ -9,7 +9,7 @@ export default function LibraryGallery({ title, subtitle, bookmarkBooks }) {
         href="/dashboard/user"
         className="inline-flex items-center gap-2 text-sm text-ink-muted no-underline hover:text-gold"
       >
-        <FaArrowLeft className="h-3 w-3" /> Profile
+        <FaArrowLeft className="h-3 w-3" /> Overview
       </Link>
       <div className="mt-8 flex items-end justify-between gap-4">
         <div>
@@ -44,7 +44,7 @@ export default function LibraryGallery({ title, subtitle, bookmarkBooks }) {
       ) : (
         <section className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
           {bookmarkBooks.map((book) => (
-            <article key={book.title} className="group">
+            <article key={book._id} className="group">
               <div className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-bg-card shadow-lg">
                 <Image
                   src={book.coverImage}

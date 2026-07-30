@@ -48,8 +48,8 @@ export default function AdminDashboard() {
           </div>
         ))}
       </section>
-      <section className="mt-7 grid gap-5 lg:grid-cols-[1.5fr_1fr]">
-        <div className="rounded-2xl border border-white/[0.07] bg-bg-card p-6">
+      <section className="mt-7 grid gap-5 lg:grid-cols-[2fr_1fr]">
+        {/* <div className="rounded-2xl border border-white/[0.07] bg-bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-serif text-2xl font-semibold text-ink">
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
             <span>Feb</span>
             <span>Jul</span>
           </div>
-        </div>
+        </div> */}
         <div className="rounded-2xl border border-white/[0.07] bg-bg-card p-6">
           <h2 className="font-serif text-2xl font-semibold text-ink">
             Ebooks by genre

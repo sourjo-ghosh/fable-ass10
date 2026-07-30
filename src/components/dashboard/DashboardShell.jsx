@@ -18,20 +18,35 @@ export default function DashboardShell({ children }) {
   const role = session?.user?.role || "reader";
   const home = roleHomes[role] || roleHomes.reader;
 
+  const isProfileRoute = pathname === "/dashboard/my-profile";
+  const isAllowedRoute =
+    pathname === home ||
+    pathname.startsWith(`${home}/`) ||
+    isProfileRoute;
+
   useEffect(() => {
     if (isPending) return;
     if (!session) {
       router.replace("/login");
       return;
     }
-    if (pathname !== home && !pathname.startsWith(`${home}/`)) {
+    if (!isAllowedRoute) {
       router.replace(home);
     }
-  }, [home, isPending, pathname, router, session]);
+  }, [home, isAllowedRoute, isPending, router, session]);
 
-  if (isPending || !session || (pathname !== home && !pathname.startsWith(`${home}/`))) {
-    return <div className="grid min-h-dvh place-items-center bg-bg-deep text-sm text-ink-muted">Loading your workspace…</div>;
+  if (isPending || !session || !isAllowedRoute) {
+    return (
+      <div className="grid min-h-dvh place-items-center bg-bg-deep text-sm text-ink-muted">
+        Loading your workspace…
+      </div>
+    );
   }
 
-  return <div className="flex min-h-dvh bg-bg-deep"><Sidebar role={role} /><div className="min-w-0 flex-1">{children}</div></div>;
+  return (
+    <div className="flex min-h-dvh bg-bg-deep">
+      <Sidebar role={role} />
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
 }

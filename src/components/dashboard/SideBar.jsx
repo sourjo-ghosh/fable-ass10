@@ -36,7 +36,11 @@ const menus = {
         icon: FaRegBookmark,
         label: "Bookmarks",
       },
-      { href: "/dashboard/user", icon: FaRegUser, label: "Profile" },
+      {
+        href: "/dashboard/my-profile",
+        icon: FaRegUser,
+        label: "My profile",
+      },
     ],
   },
   writer: {
@@ -63,6 +67,11 @@ const menus = {
         icon: FaChartLine,
         label: "Sales history",
       },
+      {
+        href: "/dashboard/my-profile",
+        icon: FaRegUser,
+        label: "My profile",
+      },
     ],
   },
   admin: {
@@ -84,6 +93,11 @@ const menus = {
         icon: FaChartLine,
         label: "Transactions",
       },
+      {
+        href: "/dashboard/my-profile",
+        icon: FaRegUser,
+        label: "My profile",
+      },
     ],
   },
 };
@@ -95,7 +109,7 @@ function ProfileSummary({ onNavigate }) {
   const email = user?.email || "reader@fable.com";
   return (
     <Link
-      href="/dashboard/user"
+      href="/dashboard/my-profile"
       onClick={onNavigate}
       className="flex items-center gap-3 rounded-xl px-3 py-3 no-underline transition-colors hover:bg-white/[0.045]"
     >
