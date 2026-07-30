@@ -88,7 +88,7 @@ export default function ManageEbooksPage() {
         <div className="flex flex-row justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <AdminTableHeader
-              title="Manage users"
+              title="Manage Ebooks"
               subtitle="Update account roles and manage access across Fable."
             />
           </div>

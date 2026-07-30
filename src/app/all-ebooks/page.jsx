@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FaMagnifyingGlass,
   FaBookOpen,
@@ -24,16 +24,25 @@ const GENRE_PALETTES = {
   default: { from: "#c9a96e", to: "#a07842", bg: "rgba(201, 169, 110, 0.12)", border: "rgba(201, 169, 110, 0.3)", text: "#c9a96e" },
 };
 
-export default function AllEbooksPage() {
+function AllEbooksContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const genreParam = searchParams.get("genre");
+
   const [ebooks, setEbooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("All");
+  const [selectedGenre, setSelectedGenre] = useState(genreParam || "All");
   const [sortBy, setSortBy] = useState("default");
+
+  useEffect(() => {
+    if (genreParam) {
+      setSelectedGenre(genreParam);
+    }
+  }, [genreParam]);
 
   // Fetch ebooks using actual GetALlEbooks server action from @/lib/actions/Ebooks
   const fetchEbooksData = async () => {
@@ -384,3 +393,21 @@ export default function AllEbooksPage() {
     </main>
   );
 }
+
+export default function AllEbooksPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-bg-deep text-ink pt-28 pb-20 px-6 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+            <p className="text-sm text-ink-muted">Loading catalogue...</p>
+          </div>
+        </main>
+      }
+    >
+      <AllEbooksContent />
+    </Suspense>
+  );
+}
+

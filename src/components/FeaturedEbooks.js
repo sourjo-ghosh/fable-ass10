@@ -1,25 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import EbookCard from "./EbookCard";
-
-const featuredEbooks = [
-  { id: 1, title: "The Midnight Library", writerName: "Elena Martinez", price: 9.99, genre: "Fiction", status: "available", isFeatured: true, coverImage: "/cover-1.jpg" },
-  { id: 2, title: "Stolen Hearts", writerName: "James Chen", price: 5.99, genre: "Romance", status: "available", isFeatured: true, coverImage: "/cover-2.jpg" },
-  { id: 3, title: "Digital Dreams", writerName: "Sophie Williams", price: 7.99, genre: "Sci-Fi", status: "sold", isFeatured: true, coverImage: "/cover-3.jpg" },
-  { id: 4, title: "Whispers in the Dark", writerName: "Marcus Johnson", price: 4.99, genre: "Mystery", status: "available", isFeatured: true, coverImage: "/cover-4.jpg" },
-  { id: 5, title: "Realm of Shadows", writerName: "Aisha Patel", price: 12.99, genre: "Fantasy", status: "available", isFeatured: true, coverImage: "/cover-5.jpg" },
-  { id: 6, title: "The Last Echo", writerName: "David Kim", price: 6.99, genre: "Horror", status: "sold", isFeatured: true, coverImage: "/cover-1.jpg" },
-];
-
-const tabs = ["All", "Fiction", "Romance", "Sci-Fi", "Mystery", "Fantasy"];
+import { GetALlEbooks } from "@/lib/actions/get/getAllEbooks";
 
 export default function FeaturedEbooks() {
-  const [activeTab, setActiveTab] = useState("All");
+  const [ebooks, setEbooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = activeTab === "All"
-    ? featuredEbooks
-    : featuredEbooks.filter((b) => b.genre === activeTab);
+  useEffect(() => {
+    async function loadFeaturedEbooks() {
+      setLoading(true);
+      try {
+        const res = await GetALlEbooks();
+        if (res?.data && Array.isArray(res.data)) {
+          // Display only the first 6 ebooks
+          setEbooks(res.data.slice(0, 6));
+        }
+      } catch (err) {
+        console.error("Failed to load featured ebooks:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFeaturedEbooks();
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-bg-deep py-[120px]">
@@ -44,45 +50,64 @@ export default function FeaturedEbooks() {
               <em className="font-serif font-light text-gold italic">Ebooks</em>
             </h2>
             <p className="mt-3.5 max-w-[380px] text-[0.95rem] leading-[1.7] text-ink-faint">
-              Handpicked selections from our curated collection of original ebooks across every genre.
+              Handpicked selections from our collection of original ebooks across every genre.
             </p>
           </div>
 
-          <a href="/browse" className="btn-ghost shrink-0 no-underline">
+          <Link href="/all-ebooks" className="btn-ghost shrink-0 no-underline">
             View All Titles
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </a>
+          </Link>
         </div>
 
-        <div className="mb-11 flex w-fit flex-wrap gap-1.5 rounded-2xl border border-white/[0.06] bg-bg-card p-1.5">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`cursor-pointer rounded-[10px] border-none px-5 py-2 text-[0.8rem] font-semibold tracking-wide transition-all duration-250 ease-[cubic-bezier(.4,0,.2,1)] ${
-                activeTab === tab
-                  ? "bg-gradient-to-br from-gold to-gold-light text-bg-deep shadow-[0_4px_12px_rgba(201,169,110,0.3)]"
-                  : "bg-transparent text-ink-faint hover:text-ink-muted"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        {loading ? (
+          /* Loading Skeletons */
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-[repeat(auto-fill,minmax(170px,1fr))]">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col overflow-hidden rounded-[20px] border border-white/[0.06] bg-bg-card p-3.5 animate-pulse"
+              >
+                <div className="aspect-[3/4] w-full rounded-xl bg-white/[0.05] mb-3.5" />
+                <div className="h-4 w-20 rounded-full bg-white/[0.06] mb-3" />
+                <div className="h-5 w-3/4 rounded-md bg-white/[0.08] mb-2" />
+                <div className="h-3.5 w-1/2 rounded-md bg-white/[0.05]" />
+              </div>
+            ))}
+          </div>
+        ) : ebooks.length === 0 ? (
+          <div className="rounded-2xl border border-white/[0.07] bg-bg-card p-8 text-center text-ink-muted">
+            No ebooks available at the moment.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-[repeat(auto-fill,minmax(170px,1fr))]">
+            {ebooks.map((ebook, i) => {
+              const bookId = ebook._id || ebook.id || i;
+              const formattedEbook = {
+                id: bookId,
+                title: ebook.title || "Untitled Ebook",
+                writerName: ebook.authorName || ebook.writerName || "Fable Author",
+                price: typeof ebook.price === "number" ? ebook.price : parseFloat(ebook.price) || 0,
+                genre: ebook.genre || "General",
+                status: ebook.status || "available",
+                coverImage: ebook.coverImage || null,
+              };
 
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-[repeat(auto-fill,minmax(170px,1fr))]">
-          {filtered.map((ebook, i) => (
-            <div
-              key={ebook.id}
-              className="animate-scale-in"
-              style={{ animationDelay: `${i * 0.06}s` }}
-            >
-              <EbookCard ebook={ebook} />
-            </div>
-          ))}
-        </div>
+              return (
+                <Link
+                  key={bookId}
+                  href={`/all-ebooks/${bookId}`}
+                  className="no-underline block animate-scale-in"
+                  style={{ animationDelay: `${i * 0.06}s` }}
+                >
+                  <EbookCard ebook={formattedEbook} />
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
         <div className="relative mt-20 flex flex-wrap items-center justify-between gap-8 overflow-hidden rounded-3xl border border-white/[0.07] bg-gradient-to-br from-bg-card to-bg-raised p-8 md:p-12">
           <div
@@ -96,16 +121,16 @@ export default function FeaturedEbooks() {
               <em className="text-gold italic">the world.</em>
             </h3>
             <p className="mt-3 max-w-[420px] text-[0.9rem] text-ink-faint">
-              Join 500+ authors publishing their work on Fable. Set your own prices, keep 85% of revenue.
+              Join authors publishing their work on Fable. Share your ebooks, set your own prices.
             </p>
           </div>
           <div className="relative">
-            <a href="/signup" className="btn-gold no-underline">
+            <Link href="/signup" className="btn-gold no-underline">
               Start Publishing
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
