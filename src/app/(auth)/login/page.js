@@ -69,7 +69,7 @@ export default function LoginPage() {
     setErrors({});
     setIsSubmitting(true);
     try {
-      await authClient.signIn.social({
+      const result = await authClient.signIn.social({
         provider: "google",
         // callbackURL: "/role-selector",
       });

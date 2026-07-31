@@ -30,48 +30,6 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   const { data: session } = authClient.useSession();
   const userId = session?.user?.id;
   const [status, setStatus] = useState("Found");
-  // useEffect(() => {
-  //   async function loadEbook() {
-  //     if (!id) return;
-  //     setLoading(true);
-  //     setError(null);
-  //     try {
-  //       const interval = setInterval(async () => {
-  //         const res = await getEbookById(id);
-
-  //         if (!res?.success) {
-  //           setStatus("deleted");
-  //           return;
-  //         }
-
-  //         if (!res.data.isPublished) {
-  //           setStatus("unpublished");
-  //         }
-  //         if (res.success) {
-  //           setEbook(res.data);
-  //           setStatus("found");
-  //         }
-  //       }, 10000);
-  //       return () => clearInterval(interval);
-  //       // const res = await getEbookById(id);
-  //       // if (res?.success && res?.data) {
-  //       //   if (!res.data.isPublished) {
-  //       //     setStatus("unpublished");
-  //       //   } else {
-  //       //   }
-  //       // } else {
-  //       //   setStatus("deleted");
-  //       // }
-  //     } catch (err) {
-  //       console.error("Failed to load ebook detail:", err);
-  //       setError(err.message || "Could not connect to server.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  //   loadEbook();
-  // }, [id]);
-  // useEffect 1 — শুধু initial load (একবার চলবে)
   useEffect(() => {
     async function loadEbook() {
       if (!id) return;
@@ -118,7 +76,7 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       setStatus("found");
     }, 10000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [id]);
   useEffect(() => {
     if (!userId || !ebook?._id) return;
@@ -189,7 +147,24 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       toast.error("Failed to toggle bookmark");
     }
   };
-  const handleBuyBook = async (ebookId) => {};
+  const handleBuyBook = async (ebookId) => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/create-checkout-session`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ebookId,
+          userId, // Logged in user only
+        }),
+      },
+    );
+    const data = await response.json();
+
+    window.location.href = data.url;
+  };
   if (error || !ebook) {
     return (
       <main className="min-h-screen bg-bg-deep text-ink pt-32 pb-20 px-6 text-center">
@@ -317,23 +292,12 @@ export default function EbookDetailPage({ params: paramsPromise }) {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 {userId ? (
-                  // <button
-                  //   onClick={() => handleBuyBook(ebook._id)}
-                  //   className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
-                  // >
-                  //   <FaCartShopping /> Buy Now
-                  // </button>
-                  <form action="/api/payments" method="POST">
-                    <section>
-                      <button
-                        className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
-                        type="submit"
-                        role="link"
-                      >
-                        Checkout
-                      </button>
-                    </section>
-                  </form>
+                  <button
+                    onClick={() => handleBuyBook(ebook._id)}
+                    className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
+                  >
+                    <FaCartShopping /> Buy Now
+                  </button>
                 ) : (
                   <button
                     onClick={() => toast.error("Login First")}
