@@ -1,19 +1,17 @@
+import { getPurchasedHistory } from "@/lib/actions/user/getPurchasedHistory";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { FaArrowLeft, FaCheck, FaReceipt } from "react-icons/fa6";
 
-const purchases = [
-  ["The Silent Patient", "Alex Michaelides", "$14.99", "Jul 18, 2026"],
-  ["The Midnight Library", "Matt Haig", "$12.99", "Jul 11, 2026"],
-  ["Circe", "Madeline Miller", "$15.50", "Jun 28, 2026"],
-  [
-    "Tomorrow, and Tomorrow, and Tomorrow",
-    "Gabrielle Zevin",
-    "$16.99",
-    "Jun 16, 2026",
-  ],
-];
+export default async function PurchaseHistoryPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const userId = session?.user?.id;
+  const purchasedHistoryData = await getPurchasedHistory({ userId });
+  const data = purchasedHistoryData || [];
 
-export default function PurchaseHistoryPage() {
   return (
     <main className="mx-auto max-w-6xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
       <Link
@@ -47,19 +45,28 @@ export default function PurchaseHistoryPage() {
             </tr>
           </thead>
           <tbody>
-            {purchases.map(([title, author, price, date]) => (
+            {data.map((item) => (
               <tr
-                key={title}
+                key={item.title}
                 className="border-b border-white/[0.05] last:border-0"
               >
                 <td className="px-6 py-5 font-serif text-lg font-semibold text-ink">
-                  {title}
+                  {item.title}
                 </td>
-                <td className="px-6 py-5 text-sm text-ink-muted">{author}</td>
+                <td className="px-6 py-5 text-sm text-ink-muted">
+                  {item.author}
+                </td>
                 <td className="px-6 py-5 text-sm font-semibold text-gold">
-                  {price}
+                  {item.price}
                 </td>
-                <td className="px-6 py-5 text-sm text-ink-muted">{date}</td>
+                <td className="px-6 py-5 text-sm text-ink-muted">
+                  {/* {item.date} */}
+                  {new Date(item.date).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </td>
                 <td className="px-6 py-5">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
                     <FaCheck className="h-2.5 w-2.5" /> Complete
@@ -71,7 +78,7 @@ export default function PurchaseHistoryPage() {
         </table>
       </div>
       <div className="mt-5 flex items-center gap-2 text-xs text-ink-faint">
-        <FaReceipt className="text-gold" /> Showing 4 purchases
+        <FaReceipt className="text-gold" /> Showing {data.length} purchases
       </div>
     </main>
   );

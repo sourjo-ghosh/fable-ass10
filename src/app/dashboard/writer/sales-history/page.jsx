@@ -1,4 +1,7 @@
 import WriterPageHeader from "@/components/dashboard/WriterPageHeader";
+import { getSalesHistory } from "@/lib/actions/writer/getSalesHistory";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const sales = [
   ["A House of Glass", "Ava Mitchell", "Jul 22, 2026", "$12.50"],
@@ -6,7 +9,14 @@ const sales = [
   ["A House of Glass", "Mia Johnson", "Jul 18, 2026", "$12.50"],
   ["The Paper Garden", "Noah Wilson", "Jul 15, 2026", "$9.99"],
 ];
-export default function SalesHistoryPage() {
+export default async function SalesHistoryPage() {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    const userId = session?.user?.id;
+    const purchasedHistoryData = await getSalesHistory({ userId });
+    const data = purchasedHistoryData || [];
+    console.log("SalesHistoryPage data:", purchasedHistoryData); // Debugging line to check the data being passed
   return (
     <main className="mx-auto max-w-7xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
       <WriterPageHeader
@@ -25,18 +35,25 @@ export default function SalesHistoryPage() {
             </tr>
           </thead>
           <tbody>
-            {sales.map(([title, buyer, date, amount], index) => (
+            {data.map((item) => (
               <tr
-                key={`${title}-${index}`}
+                key={item.id}
                 className="border-b border-white/[.05] last:border-0"
               >
                 <td className="px-6 py-5 font-serif text-lg font-semibold text-ink">
-                  {title}
+                  {item.title}
                 </td>
-                <td className="px-6 py-5 text-sm text-ink-muted">{buyer}</td>
-                <td className="px-6 py-5 text-sm text-ink-muted">{date}</td>
+                <td className="px-6 py-5 text-sm text-ink-muted">{item.buyer}</td>
+                <td className="px-6 py-5 text-sm text-ink-muted">
+                  
+                    {new Date(item.date).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                  </td>
                 <td className="px-6 py-5 text-sm font-semibold text-gold">
-                  {amount}
+                  {item.amount}
                 </td>
               </tr>
             ))}
