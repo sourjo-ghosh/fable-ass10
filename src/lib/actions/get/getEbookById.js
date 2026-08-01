@@ -2,10 +2,10 @@
 
 // Fetches a single ebook by its MongoDB _id
 // Used by: all-ebooks/[id]/page.jsx  AND  edit-ebook/[slug]/page.jsx
-export async function getEbookById(id) {
+export async function getEbookById(id, userId) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/ebook/${id}`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/ebook/${id}/${userId}`,
       { cache: "no-store" }
     );
 

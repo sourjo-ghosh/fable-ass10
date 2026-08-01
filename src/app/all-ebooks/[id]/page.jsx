@@ -29,14 +29,15 @@ export default function EbookDetailPage({ params: paramsPromise }) {
   const [bookmarked, setBookmarked] = useState(false);
   const { data: session } = authClient.useSession();
   const userId = session?.user?.id;
+  const role = session?.user?.role;
   const [status, setStatus] = useState("Found");
-  useEffect(() => {
+  const IsWriter = useEffect(() => {
     async function loadEbook() {
       if (!id) return;
       setLoading(true);
       setError(null);
       try {
-        const res = await getEbookById(id);
+        const res = await getEbookById(id, userId);
         if (res?.success && res?.data) {
           if (!res.data.isPublished) {
             setStatus("unpublished");
@@ -60,7 +61,7 @@ export default function EbookDetailPage({ params: paramsPromise }) {
     if (!id) return;
 
     const interval = setInterval(async () => {
-      const res = await getEbookById(id);
+      const res = await getEbookById(id, userId);
 
       if (!res?.success) {
         setStatus("deleted");
@@ -136,10 +137,10 @@ export default function EbookDetailPage({ params: paramsPromise }) {
       );
       const results = await res.json();
       if (results.bookmarked) {
-        toast.success("Added Bookmark");
+        toast.success(results.message);
         setBookmarked(true);
       } else {
-        toast.error("Remove Bookmark");
+        toast.error(results.message);
         setBookmarked(false);
       }
     } catch (err) {
@@ -148,23 +149,42 @@ export default function EbookDetailPage({ params: paramsPromise }) {
     }
   };
   const handleBuyBook = async (ebookId) => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/create-checkout-session`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ebookId,
-          userId, // Logged in user only
-        }),
-      },
-    );
-    const data = await response.json();
+    // Safe guard: check if id exists before making the request
+    if (!ebookId) {
+      console.error("Ebook ID is missing");
+      return;
+    }
 
-    window.location.href = data.url;
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ebookId,
+            userId, // Logged in user only
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.message || "Failed to create checkout session");
+      }
+    } catch (error) {
+      console.error("Network error during payment processing:", error);
+      toast.error(
+        "Something went wrong with the connection. Please try again.",
+      );
+    }
   };
+
   if (error || !ebook) {
     return (
       <main className="min-h-screen bg-bg-deep text-ink pt-32 pb-20 px-6 text-center">
@@ -291,19 +311,40 @@ export default function EbookDetailPage({ params: paramsPromise }) {
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
-                {userId ? (
-                  <button
-                    onClick={() => handleBuyBook(ebook._id)}
-                    className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
-                  >
-                    <FaCartShopping /> Buy Now
-                  </button>
+                {userId ? ( 
+                  // 1. Check if the user is an admin or writer
+                  role === "admin" || userId === ebook?.authorId ? (
+                    <button
+                      disabled
+                      className="btn-disabled flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline opacity-50 cursor-not-allowed border border-white/10"
+                    >
+                      {" "}
+                      Creators Cannot Buy{" "}
+                    </button> // 2. If valid user, check if product is available or sold
+                  ) : ebook?.status === "Available" ? (
+                    <button
+                      onClick={() => handleBuyBook(ebook._id)}
+                      className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
+                    >
+                      {" "}
+                      <FaCartShopping /> Buy Now{" "}
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="bg-red-600/20 text-red-400 border border-red-500/30 flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline cursor-not-allowed"
+                    >
+                      {" "}
+                      Sold Out{" "}
+                    </button>
+                  ) // 3. Fallback if no userId exists (unauthenticated)
                 ) : (
                   <button
                     onClick={() => toast.error("Login First")}
                     className="btn-gold flex-1 sm:flex-initial justify-center gap-2 px-6 py-3 text-xs no-underline"
                   >
-                    <FaCartShopping /> Buy Now
+                    {" "}
+                    <FaCartShopping /> Buy Now{" "}
                   </button>
                 )}
 
