@@ -13,7 +13,7 @@ export default async function BookmarksPage() {
     <LibraryGallery
       title="Bookmarks"
       subtitle="Your saved stories, ready for the next quiet moment."
-      bookmarkBooks={data}
+      data={data}
     />
   );
 }
