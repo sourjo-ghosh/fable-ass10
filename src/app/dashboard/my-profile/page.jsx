@@ -38,7 +38,6 @@ const roleLabels = {
 export default function MyProfilePage() {
   const { data: session, isPending, refetch } = authClient.useSession();
   const user = session?.user;
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [preview, setPreview] = useState("");
@@ -117,7 +116,7 @@ export default function MyProfilePage() {
         if (emailError) {
           toast.error(
             emailError.message ||
-              "Name and photo saved, but email could not be updated.",
+            "Name and photo saved, but email could not be updated.",
           );
           await refetch();
           setSaving(false);
@@ -159,11 +158,41 @@ export default function MyProfilePage() {
         : "/dashboard/user";
   const memberSince = user.createdAt
     ? new Date(user.createdAt).toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      })
+      month: "long",
+      year: "numeric",
+    })
     : "—";
+  const handleVerify = async () => {
+    // Safe guard: check if id exists before making the request
 
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/verify-writer`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user.id, // Logged in user only
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (data.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.message || "Failed to verify writer status.");
+      }
+    } catch (error) {
+      console.error("Network error during payment processing:", error);
+      toast.error(
+        "Something went wrong with the connection. Please try again.",
+      );
+    }
+  };
   return (
     <main className="mx-auto max-w-3xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
       <Link
@@ -239,7 +268,7 @@ export default function MyProfilePage() {
                 {user.name || "Reader"}
               </h2>
               <p className="mt-1 text-sm text-ink-muted">{user.email}</p>
-              <div className="mt-7 grid gap-4 border-t border-white/[0.07] pt-6 sm:grid-cols-2">
+              <div className="mt-7 grid grid-cols-1 gap-4 border-t border-white/[0.07] pt-6 sm:grid-cols-3">
                 <div>
                   <p className="text-xs font-bold tracking-[0.14em] text-ink-faint uppercase">
                     Role
@@ -254,7 +283,31 @@ export default function MyProfilePage() {
                   </p>
                   <p className="mt-2 text-sm text-ink">{memberSince}</p>
                 </div>
+                {role === "writer" && (
+                  <div>
+                    <p className="text-xs font-bold tracking-[0.14em] text-ink-faint uppercase">
+                      Verify status
+                    </p>
+                    <p className="mt-2 text-sm text-ink">{user?.emailVerified ? "Verified" : "Not verified"}</p>
+                  </div>
+                )}
               </div>
+              {role === "writer" && !user?.emailVerified && (
+                <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-white/[0.07] pt-6">
+                  <p className="text-xs font-bold tracking-[0.14em] text-ink-faint uppercase max-w-md">
+                    Verify your identity to unlock additional features.
+                  </p>
+                  <button
+                  type="button"
+                    onClick={() => {
+                      handleVerify();
+                    }}
+                    className="btn-gold w-full sm:w-auto px-6 py-3 text-xs font-semibold whitespace-nowrap transition-all hover:opacity-90 text-center"
+                  >
+                    Verify
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="mt-8 space-y-6">

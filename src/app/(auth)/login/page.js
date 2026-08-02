@@ -74,7 +74,8 @@ export default function LoginPage() {
         // callbackURL: "/role-selector",
       });
       const userRole = result?.data?.user?.role;
-      if (!userRole) {
+      console.log("Google login result:", result);
+      if (userRole) {
         router.push("/role-selector");
       } else {
         router.push("/"); 

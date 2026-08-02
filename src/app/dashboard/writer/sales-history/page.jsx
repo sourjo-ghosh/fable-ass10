@@ -16,7 +16,6 @@ export default async function SalesHistoryPage() {
     const userId = session?.user?.id;
     const purchasedHistoryData = await getSalesHistory({ userId });
     const data = purchasedHistoryData || [];
-    console.log("SalesHistoryPage data:", purchasedHistoryData); // Debugging line to check the data being passed
   return (
     <main className="mx-auto max-w-7xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
       <WriterPageHeader
