@@ -38,6 +38,7 @@ export default function EbookForm() {
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
+  const userId = session?.user?.id;
   const handleImageChange = (e) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
@@ -81,8 +82,8 @@ export default function EbookForm() {
         UploadedDate: new Date(),
         status: "Available"
       };
-
-      const result = await AddEbook(bookData);
+      console.log("Submitting ebook data:", bookData);
+      const result = await AddEbook(bookData, userId );
 
       if (result?.success) {
         toast.success("Ebook created successfully!");
@@ -92,6 +93,7 @@ export default function EbookForm() {
         setFile(null);
       } else {
         setStatus({ type: "error", message: result?.error || "Failed to create ebook." });
+        toast.error(result?.error || "Failed to create ebook.");
       }
     } catch (err) {
       console.error("EbookForm submit error:", err);

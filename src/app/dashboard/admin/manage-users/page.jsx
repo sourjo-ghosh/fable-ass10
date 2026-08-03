@@ -44,27 +44,26 @@ export default function ManageUsersPage() {
     fetchUsers();
   }, [adminId]);
 
-  // ── Role Change Handler ──
   const handleRoleChange = async (userId, newRole) => {
-    try {
-      const result = await ChangeUserRole(userId, newRole, adminId);
-      if (result?.success) {
-        // Optimistically update the role in the list
-        setUsers((prev) =>
-          prev.map((u) =>
-            (u._id || u.id) === userId ? { ...u, role: newRole } : u,
-          ),
-        );
-        toast.success(result?.data?.message || "Role updated!");
-      } else {
-        toast.error(result?.error || "Failed to change role.");
-      }
-    } catch (err) {
-      toast.error("Something went wrong. Please try again.");
+    const { error } = await authClient.admin.setRole({
+      userId: userId,
+      role: newRole,
+    });
+
+    if (error) {
+      toast.error(error.message || "Role change failed.");
+      return;
     }
+
+    setUsers((prev) =>
+      prev.map((u) =>
+        (u._id || u.id) === userId ? { ...u, role: newRole } : u,
+      ),
+    );
+
+    toast.success("Role updated successfully.");
   };
 
-  // ── Ban/Unban Handlers ──
   const handleBanClick = (userId, name, isBanned) => {
     setConfirmBan({ userId, name, isBanned });
   };
@@ -72,24 +71,28 @@ export default function ManageUsersPage() {
   const handleBanConfirm = async () => {
     if (!confirmBan?.userId) return;
     setBanning(true);
+
     try {
-      const result = await BanUnbanUser(confirmBan.userId, adminId);
-      if (result?.success) {
-        // Optimistically toggle ban status in the list
-        setUsers((prev) =>
-          prev.map((u) =>
-            (u._id || u.id) === confirmBan.userId
-              ? { ...u, banned: !u.banned }
-              : u,
-          ),
-        );
-        toast.success(
-          result?.data?.message ||
-            `User ${confirmBan.isBanned ? "unbanned" : "banned"} successfully.`,
-        );
-      } else {
-        toast.error(result?.error || "Failed to update user status.");
+      const { error } = confirmBan.isBanned
+        ? await authClient.admin.unbanUser({ userId: confirmBan.userId })
+        : await authClient.admin.banUser({ userId: confirmBan.userId });
+
+      if (error) {
+        toast.error(error.message || "Failed to update user status.");
+        return;
       }
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          (u._id || u.id) === confirmBan.userId
+            ? { ...u, banned: !u.banned }
+            : u,
+        ),
+      );
+
+      toast.success(
+        `User ${confirmBan.isBanned ? "unbanned" : "banned"} successfully.`,
+      );
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
     } finally {

@@ -1,8 +1,8 @@
 "use server";
 
-export async function AddEbook(ebookData) {
+export async function AddEbook(bookData, userId) {
   try {
-    const { coverImage, title, content, price, genre } = ebookData;
+    const { coverImage, title, content, price, genre } = bookData;
 
     if (!title || !content || price === undefined || !genre) {
       return {
@@ -21,10 +21,9 @@ export async function AddEbook(ebookData) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(ebookData),
+      body: JSON.stringify({ bookData, userId }),
       cache: "no-store",
     });
-
     if (!res.ok) {
       const errorText = await res.text();
       console.error("Backend server returned error:", res.status, errorText);
@@ -33,8 +32,8 @@ export async function AddEbook(ebookData) {
         error: `Server responded with status ${res.status}: ${errorText || "Failed to save ebook."}`,
       };
     }
-
     const result = await res.json();
+
 
     return {
       success: true,

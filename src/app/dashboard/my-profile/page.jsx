@@ -181,7 +181,7 @@ export default function MyProfilePage() {
 
       const data = await response.json();
 
-      if (data.ok && data.url) {
+      if (response.ok && data.url) {
         window.location.href = data.url;
       } else {
         toast.error(data.message || "Failed to verify writer status.");
