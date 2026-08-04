@@ -69,17 +69,10 @@ export default function LoginPage() {
     setErrors({});
     setIsSubmitting(true);
     try {
-      const result = await authClient.signIn.social({
+      await authClient.signIn.social({
         provider: "google",
-        // callbackURL: "/role-selector",
+        callbackURL: "/role-selector", 
       });
-      const userRole = result?.data?.user?.role;
-      console.log("Google login result:", result);
-      if (userRole) {
-        router.push("/role-selector");
-      } else {
-        router.push("/"); 
-      }
     } catch (err) {
       setErrors({ general: err.message || "Unable to continue with Google" });
       toast.error(err.message || "Unable to continue with Google");

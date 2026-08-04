@@ -31,9 +31,11 @@ export default function RoleSelectorPage() {
   const [selectedRole, setSelectedRole] = useState(null);
 
   useEffect(() => {
-    if (!isPending && !session) router.replace("/login");
+    if (!isPending && session) {
+      router.replace("/login");
+      return;
+    }
   }, [isPending, router, session]);
-  // console.log("Session data:", session); // Log the session data for debugging
   const chooseRole = async (role) => {
     setSelectedRole(role.value);
     const { error } = await authClient.updateUser({ role: role.value });
@@ -45,24 +47,6 @@ export default function RoleSelectorPage() {
       );
       return;
     }
-    // if (role.value === "writer") {
-    //   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/set-writer-status`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ userId: session.user.id }),
-    //   });
-    //   const results = await res.json();
-    //   if (results.error) {
-    //     toast.error(
-    //       results.error.message ||
-    //         "We couldn't initiate writer verification. Please try again.",
-    //     );
-    //     return;
-    //   }
-    // }
-    // console.log(`Role updated to: ${session.user}`); // Log the role update for debugging
     toast.success(`Welcome to Fable, ${role.title}!`);
     router.replace("/");
   };

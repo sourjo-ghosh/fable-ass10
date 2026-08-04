@@ -1,4 +1,7 @@
 import AdminTableHeader from "@/components/dashboard/AdminTableHeader";
+import { getAllTransactions } from "@/lib/actions/admin/getAllTransections";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const transactions = [
   ["TRX-84291", "Purchase", "ava@fable.com", "$14.99", "Jul 22, 2026"],
@@ -7,7 +10,14 @@ const transactions = [
   ["TRX-84288", "Purchase", "liam@fable.com", "$9.99", "Jul 19, 2026"],
 ];
 
-export default function TransactionsPage() {
+export default async function TransactionsPage() {
+   const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    const userId = session?.user?.id;
+    const allTransactions = await getAllTransactions({ userId });
+    const data = allTransactions?.data || [];
+    console.log("All transactions data:", data);
   return (
     <main className="mx-auto max-w-7xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
       <AdminTableHeader
@@ -32,24 +42,30 @@ export default function TransactionsPage() {
             </tr>
           </thead>
           <tbody>
-            {transactions.map(([id, type, email, amount, date]) => (
+            {data.map((item) => (
               <tr
-                key={id}
+                key={item.id}
                 className="border-b border-white/[0.05] last:border-0"
               >
-                <td className="px-6 py-5 font-mono text-xs text-gold">{id}</td>
+                <td className="px-6 py-5 font-mono text-xs text-gold">{item.id}</td>
                 <td className="px-6 py-5">
                   <span
-                    className={`rounded-full px-2.5 py-1 text-xs ${type === "Purchase" ? "bg-emerald-400/10 text-emerald-300" : "bg-sky-400/10 text-sky-300"}`}
+                    className={`rounded-full px-2.5 py-1 text-xs ${item.type === "ebook_purchase" ? "bg-emerald-400/10 text-emerald-300" : "bg-sky-400/10 text-sky-300"}`}
                   >
-                    {type}
+                    {item.type === "ebook_purchase" ? "Purchase" : "Writer fee"}
                   </span>
                 </td>
-                <td className="px-6 py-5 text-sm text-ink-muted">{email}</td>
+                <td className="px-6 py-5 text-sm text-ink-muted">{item.email}</td>
                 <td className="px-6 py-5 text-sm font-semibold text-ink">
-                  {amount}
+                  {item.amount}
                 </td>
-                <td className="px-6 py-5 text-sm text-ink-muted">{date}</td>
+                <td className="px-6 py-5 text-sm text-ink-muted">
+                  {new Date(item.date).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </td>
               </tr>
             ))}
           </tbody>

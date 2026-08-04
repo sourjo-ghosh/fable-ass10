@@ -1,3 +1,6 @@
+import { getAdminAnalytics } from "@/lib/actions/admin/getAdminAnalytics";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 import {
   FaArrowRight,
@@ -15,7 +18,14 @@ const genres = [
   ["Mystery", "#a78bfa"],
 ];
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const userId = session?.user?.id;
+  const adminAnalytics = await getAdminAnalytics({ userId });
+  const data = adminAnalytics?.data;
+  console.log("Admin analytics data:", data);
   return (
     <main className="mx-auto max-w-7xl px-5 pt-22 pb-12 sm:px-8 lg:px-12 lg:pt-12">
       <p className="text-xs font-bold tracking-[0.18em] text-gold uppercase">
@@ -29,10 +39,27 @@ export default function AdminDashboard() {
       </p>
       <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { icon: FaUsers, value: "1,284", label: "Total users" },
-          { icon: FaBookOpen, value: "86", label: "Total writers" },
-          { icon: FaChartLine, value: "3,842", label: "Ebooks sold" },
-          { icon: FaDollarSign, value: "$48,920", label: "Total revenue" },
+          {
+            icon: FaUsers,
+            value: data?.totalUsers ?? result?.totalUsers ?? "0",
+            label: "Total users",
+          },
+          {
+            icon: FaBookOpen,
+            value: data?.totalWriters ?? result?.totalWriters ?? "0",
+            label: "Total writers",
+          },
+          {
+            icon: FaChartLine,
+            value:
+              data?.totalEbooksSold ?? result?.data?.totalEbooksSold ?? result?.totalEbooksSold ?? "0",
+            label: "Ebooks sold",
+          },
+          {
+            icon: FaDollarSign,
+            value: `$${data?.totalRevenue ?? result?.data?.totalRevenue ?? result?.totalRevenue ?? "0.00"}`,
+            label: "Total revenue",
+          },
         ].map(({ icon: Icon, value, label }) => (
           <div
             key={label}
@@ -48,41 +75,8 @@ export default function AdminDashboard() {
           </div>
         ))}
       </section>
-      <section className="mt-7 grid gap-5 lg:grid-cols-[2fr_1fr]">
-        {/* <div className="rounded-2xl border border-white/[0.07] bg-bg-card p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-serif text-2xl font-semibold text-ink">
-                Monthly sales
-              </h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Revenue performance over the last 12 months.
-              </p>
-            </div>
-            <span className="text-sm font-semibold text-emerald-300">
-              +18.4%
-            </span>
-          </div>
-          <div className="mt-8 flex h-52 items-end gap-2">
-            {sales.map((value, i) => (
-              <div key={i} className="group flex flex-1 flex-col justify-end">
-                <span className="mb-2 hidden text-center text-[10px] text-gold group-hover:block">
-                  ${value}k
-                </span>
-                <div
-                  className="rounded-t-md bg-gradient-to-t from-gold to-gold-light transition-opacity group-hover:opacity-80"
-                  style={{ height: `${(value / 146) * 100}%` }}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="mt-3 flex justify-between text-[10px] text-ink-faint">
-            <span>Aug</span>
-            <span>Nov</span>
-            <span>Feb</span>
-            <span>Jul</span>
-          </div>
-        </div> */}
+
+      {/* <section className="mt-7 grid gap-5 lg:grid-cols-[2fr_1fr]">
         <div className="rounded-2xl border border-white/[0.07] bg-bg-card p-6">
           <h2 className="font-serif text-2xl font-semibold text-ink">
             Ebooks by genre
@@ -110,7 +104,7 @@ export default function AdminDashboard() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
       <section className="mt-7 grid gap-4 sm:grid-cols-3">
         {[
           {

@@ -3,12 +3,6 @@ import { getSalesHistory } from "@/lib/actions/writer/getSalesHistory";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-const sales = [
-  ["A House of Glass", "Ava Mitchell", "Jul 22, 2026", "$12.50"],
-  ["A Map of Stars", "Liam Carter", "Jul 20, 2026", "$14.00"],
-  ["A House of Glass", "Mia Johnson", "Jul 18, 2026", "$12.50"],
-  ["The Paper Garden", "Noah Wilson", "Jul 15, 2026", "$9.99"],
-];
 export default async function SalesHistoryPage() {
     const session = await auth.api.getSession({
       headers: await headers(),
