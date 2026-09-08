@@ -1,146 +1,223 @@
-A10_CAT-012
-🎬Video Explanation: fable-requirement-explanation.mp4
+# Fable
 
+Fable is a premium digital bookstore and ebook marketplace built with Next.js. Readers can discover and purchase original ebooks, writers can publish and manage their books, and administrators can moderate the catalogue and monitor platform activity.
 
-Fable – Ebook Sharing Platform
-Project Overview and Discussion
-Project Theme:
-Fable is a digital platform that connects ebook lovers, readers, and collectors with talented writers. The platform allows users to browse, discover, and read original ebooks. Writers can upload and manage their creations after a one-time verification payment, while an admin oversees the entire system.
-Why should we develop the project?
-Traditional ebook reading is often limited to bookstores or libraries. An online ebook sharing platform democratizes access to literature, enables emerging writers to reach global audiences, and provides a secure, streamlined reading experience. The project demonstrates advanced MERN stack concepts including role-based access, payment integration, and interactive features and analytics.
-How does the system work?
-Users (Readers) browse ebooks, view details, purchase via Stripe, and track reading history.
-Writers upload/manage their ebooks. They can publish/unpublish, edit, delete, and see sales history.
-Admin manages users (role changes), all ebooks (publish/unpublish/delete), and all transactions.
-Authentication uses JWT with email/password and Google login.
-Dashboards are role-specific with CRUD operations, payment flows, and analytics.
-Ensure the following things to get 100% mark (No mark will contain)
-Include at least 20 meaningful commits on the client side & 12 meaningful commits on the server side with descriptive messages.
-Include a README file with the project name, purpose, live URL, key features, and any npm packages you have used.
-Secure Frontend configuration keys using environment variables.
-Secure your MongoDB credentials using the environment variable.
-Create a design that encourages recruiters. Color contrast should please the eye & ensure that the website has proper alignment, space, and the website does not express gobindo design.
-If we found your project similar to any project of your module / conceptual / assignment. You will get 0 and may miss the chance of any upcoming reward.
-Deployment Guideline
-If your Deployment is not okay you will get 0 and may miss the chance of our upcoming rewards.
-Ensure that your server is working perfectly on production and not throwing any CORS / 404 / 504 Errors.
-Ensure that your Live Link is working perfectly and that it is not showing errors on Landing in your system.
-⚠️ ensure that the page doesn't throw any error on reloading from any routes.
-⚠️ Logged in User must not redirect to Login on reloading any private route
-Layout & Page Structure
-Navbar Requirements
-Logo / site name (links to Home)
-Navigation links: Home, Browse Ebooks, Dashboard, Login/Logout
-Responsive mobile menu (hamburger icon)
-Active route highlighting
-Banner Section
-Beautiful hero banner featuring digital ebook sharing art (Slider or Carousel preferred)
-Footer Requirements
-Copyright information
-Quick links (About, Contact, Privacy Policy)
-Social media icons (dummy links)
-Newsletter signup placeholder (frontend only)
-Authentication System
-Registration Requirements
-Users can register with email + password or Google Login (BetterAuth).
-Required fields: Full Name, Email, Password, Confirm Password.
-After registration, the option to choose a role between User (Reader) and Writer.
-Email must be unique.
-Successful registration returns a JWT token and redirects to Home.
-Login Requirements
-Login via email/password or Google.
-For email/password: validate credentials, generate JWT (expires in 7 days).
-Google Login: integrate BetterAuth to handle OAuth flow, then issue JWT.
-Role-based redirection after login (users to Home, writers/admin to respective dashboards optional).
-Logout clears token and client-side state.
-Main Pages
-Home Page
-Hero Section – Large banner with tagline "Discover & Read Original Ebooks" and CTA button "Browse Ebooks".
-Dynamic Section – "Featured Ebooks" (fetch latest 6 ebooks from DB, random or by admin selection).
-Animation with Framer Motion – Hero text fade-in, ebook cards staggered reveal on scroll, hover scaling effects.
-Extra Section 1 – "Top Writers" (display 3 writers with most sales, using avatar and name).
-Extra Section 2 – "Ebook Genres" (grid of genres: Fiction, Mystery, Romance, Sci-Fi, Fantasy, Horror, etc., each linking to browse page with filter).
-Browse Ebooks Page
-Allow users (readers, writers, admin, guests) to explore, search, filter, and sort all available ebooks.
-Public Access – No login required to view the page. However, purchase action require authentication.
-Display Ebooks in Grid Layout
-Each ebook card shows: cover image thumbnail, title, writer name, price, and a "Sold" badge if already purchased.
-Responsive grid: 2 columns on mobile, 3 on tablet, 4 on desktop.
-Loading & Error States
-Skeleton cards while fetching.
-Friendly message when no ebooks match filters.
-Click on Ebook Card – Navigates to Ebook Details page.
-Ebook Details Page
-Show complete information about a single ebook and allow authenticated actions (purchase).
-Public Read‑Only Preview – Anyone can view ebook details. Purchase require login + role/permissions.
-Ebook Information Display
-High‑resolution cover image (from imgBB)
-Title
-Writer name (clickable link to writer's profile or their ebook list)
-Description (preview of content)
-Price
-Genre
-Status (Available / Sold)
-Date uploaded
-Purchase Button
-Disabled if: the buyer is the writer themselves.
-On click: Redirect to Stripe Checkout. After successful payment, purchase history updated, and button replaced with "Already Purchased".
-Full content becomes available after purchase.
-Allow users to bookmark ebooks they are interested in reading or purchasing later.
-Loading & Error States
-Skeleton loader while fetching.
-"Ebook not found" message for invalid ID.
-Dashboard Layout
-Dashboard for User (Role: user)
-Route: /dashboard/user
-Purchase History – Table with ebook name, writer, price, purchase date, status.
-Purchased Ebooks – Gallery view of purchased ebooks (cover image, title, link to details).
-Profile Management – view profile.
-Bookmark Page - Gallery view of bookmarked ebooks
-Dashboard for Writer (Role: writer)
-Route: /dashboard/writer
-Manage Ebooks – Table/list of own ebooks with columns: title, price, status (published/unpublished), actions (edit, delete, publish/unpublish).
-Add Ebook – Form: title, description (full content), price, genre, cover image upload (imgBB).
-Edit Ebook – Same form pre-filled.
-Bookmark Page - Gallery view of bookmarked ebooks
-Sales History – Table: ebook title, buyer name, purchase date, amount.
-Dashboard for Admin (Role: admin)
-Route: /dashboard/admin
-Manage Users – Table: name, email, role, actions (change role to user/writer/admin, delete user).
-Manage All Ebooks – Table with title, writer name, price, status, actions (publish/unpublish, delete).
-View All Transactions – Table: transaction ID, type (publishing fee / purchase), user/writer email, amount, date.
-Dashboard Home Page - 
-Analytics Overview – Cards: total users, total writers, total ebooks sold, total revenue.
-Charts – Monthly sales chart, ebooks by genre pie chart.
-Other Requirements (You must do them to get 100% marks)
-Image Upload: Use imgBB API for storing ebook cover images and profile pictures.
-Payment System (Stripe): Ebook purchase: User clicks "Buy Now", Stripe Checkout session created with ebook price; after success, ebook marked as sold, purchase record stored.
-Loading Page
-Global loading spinner (centered, with brand color).
-Skeleton loaders for ebook cards and table rows.
-Used on dashboard data fetching, payment redirection, and ebook details.
-Error Page
-Custom 404 page with illustration, message "Page Not Found", and button to go home.
-Error boundary fallback UI for runtime errors (display "Something went wrong. Reload.").
-API error toasts (e.g., "Failed to load ebooks").
-Dashboard UI Requirements
-Responsive design for mobile and tablet screens
-Consistent color theme
-Full-width dashboard
-Charts and graphs for quick data visualization
-User profile section
-Challenge Requirement Guideline
-Search & Filtering (on Browse Ebooks page): Search by title/writer name. Filter by genre, price range (min-max), availability (in stock / sold). Sorting by newest, price low-high, price high-low.
-Pagination (on Browse Ebooks page): Display ebooks in paginated format (e.g., 6–12 items per page). Navigation controls (next, previous, page numbers) for easy browsing. Can be implemented on frontend (client-side) or backend (server-side) based on developer preference.
-What to Submit
-Admin Email: admin@fable.com
-Admin Password: Admin@123
-Live Site Link: [Your deployed Vercel URL]
-GitHub Repository {server}: [Backend Express.js repo link]
-GitHub Repository {client}: [Next.js frontend repo link]
-Optional Requirement Guideline
-Wishlist System: Users can add/remove ebooks to a wishlist. The wishlist page shows saved items with the "Purchase" button. Stored in DB (User model has wishlist array of ebook IDs).
-Email Notification (dummy): After successful purchase or publishing fee payment, the user receives a simulated email (console log / nodemailer with ethereum).
-Dark Mode Toggle: Global dark mode switch (using next-themes) that persists in localStorage.
+## Live Demo
 
+[Open the live application](https://fable-six-alpha.vercel.app/)
 
+## Source Code
+
+[GitHub repository](https://github.com/sourjo-ghosh/fable-ass10)
+
+## Overview
+
+The application provides a role-based reading and publishing experience:
+
+- Guests can explore the public home page, catalogue, genres, and ebook details.
+- Readers can bookmark books, purchase ebooks through Stripe Checkout, and view their library and purchase history.
+- Writers can add, edit, publish, unpublish, and delete ebooks, then review their sales history.
+- Administrators can manage users and ebooks, change user roles, review transactions, and view platform analytics.
+
+## Core Features
+
+### Discovery and catalogue
+
+- Editorial-style home page with hero, featured ebooks, top writers, genres, and trust sections.
+- Public ebook catalogue at `/all-ebooks`.
+- Search by title, author, or genre.
+- Genre filtering and price/title sorting.
+- Responsive ebook cards, loading skeletons, empty states, and retry states.
+- Public ebook details at `/all-ebooks/[id]`.
+
+### Authentication and roles
+
+- Email and password authentication powered by Better Auth.
+- Optional Google OAuth integration.
+- MongoDB-backed authentication sessions.
+- Role selection for new accounts.
+- Protected dashboard routes with server and client-side session checks.
+- Separate workspaces for `user`, `writer`, and `admin` roles.
+
+### Reader workspace
+
+- Purchased ebook library.
+- Purchase history with writer, price, date, and status.
+- Bookmark collection.
+- Profile management.
+- Stripe Checkout purchase flow with success and cancellation pages.
+
+### Writer workspace
+
+- Ebook creation with title, description, genre, price, and cover image.
+- Image upload through ImgBB or the configured image upload endpoint.
+- Ebook editing and deletion.
+- Publish/unpublish controls.
+- Sales history.
+- Bookmarks and profile management.
+
+### Admin workspace
+
+- Platform analytics overview.
+- User management and role changes.
+- Ebook moderation, publishing controls, and deletion.
+- Transaction overview.
+
+## Tech Stack
+
+- Next.js 16 App Router
+- React 19
+- Better Auth
+- MongoDB with the Better Auth MongoDB adapter
+- Stripe Checkout
+- ImgBB image hosting
+- Tailwind CSS 4
+- HeroUI
+- React Hot Toast
+- React Icons and Gravity UI Icons
+- ESLint 9
+
+## Project Structure
+
+```text
+src/
+  app/                    Next.js routes, layouts, auth, dashboards, and payment pages
+  components/             Shared public and dashboard UI components
+  lib/
+    auth.js               Server-side Better Auth configuration
+    auth-client.js        Client-side Better Auth configuration
+    actions/              Server actions for catalogue and dashboard API calls
+  proxy.js                Session and role-based route protection
+public/                   Static assets
+```
+
+## Routes
+
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/` | Public | Home page |
+| `/all-ebooks` | Public | Searchable ebook catalogue |
+| `/all-ebooks/[id]` | Public | Ebook details and purchase entry point |
+| `/login` | Public | Sign in |
+| `/signup` | Public | Create an account |
+| `/role-selector` | Authenticated | Select a user or writer role |
+| `/dashboard/user` | User | Reader overview |
+| `/dashboard/user/purchased-ebooks` | User | Purchased ebook library |
+| `/dashboard/user/purchase-history` | User | Purchase history |
+| `/dashboard/user/bookmarks` | User | Saved ebooks |
+| `/dashboard/writer` | Writer | Writer overview |
+| `/dashboard/writer/add-ebook` | Writer | Add an ebook |
+| `/dashboard/writer/manage-ebooks` | Writer | Manage owned ebooks |
+| `/dashboard/writer/edit-ebook/[slug]` | Writer | Edit an ebook |
+| `/dashboard/writer/sales-history` | Writer | Sales history |
+| `/dashboard/admin` | Admin | Analytics overview |
+| `/dashboard/admin/manage-users` | Admin | Manage users and roles |
+| `/dashboard/admin/manage-ebooks` | Admin | Moderate ebooks |
+| `/dashboard/admin/transactions` | Admin | Review transactions |
+| `/dashboard/my-profile` | Authenticated | Manage profile |
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20 or newer is recommended.
+- npm.
+- A MongoDB database.
+- The Fable backend API running locally or deployed.
+- Stripe credentials for checkout.
+- An ImgBB API key, or a compatible image upload endpoint.
+
+### Installation
+
+```bash
+git clone <repository-url>
+cd fable
+npm install
+```
+
+Create a `.env.local` file in the project root and add the values described in the environment variables section.
+
+Add the values described below, then start the development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Environment Variables
+
+The repository intentionally ignores `.env*` files. Never commit credentials or private keys.
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `MONGODB_URI` | Yes | MongoDB connection string used by Better Auth |
+| `MONGODB_USERNAME` | Yes | MongoDB database name used by the auth adapter |
+| `NEXT_PUBLIC_BASE_URL` | Yes | Base URL used by the Better Auth client, for example `http://localhost:3000` |
+| `NEXT_PUBLIC_SERVER_URL` | Yes | Base URL of the Fable backend API, for example `http://localhost:8000` |
+| `GOOGLE_CLIENT_ID` | Optional | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Optional | Google OAuth client secret |
+| `NEXT_PUBLIC_IMGBB_API_KEY` | Optional | ImgBB key used for ebook and profile image uploads |
+| `NEXT_PUBLIC_IMAGE_UPLOAD_API` | Optional | Alternative image upload value supported by the forms |
+
+If both Google credentials are present, Google sign-in is enabled. The image upload forms use `NEXT_PUBLIC_IMAGE_UPLOAD_API` first and fall back to `NEXT_PUBLIC_IMGBB_API_KEY`.
+
+## Backend API Dependency
+
+This repository contains the Next.js client. It calls a separate backend through `NEXT_PUBLIC_SERVER_URL`. The client expects endpoints for catalogue reads, ebook CRUD, bookmarks, role management, user and writer dashboards, admin operations, and Stripe payment confirmation.
+
+The main endpoint groups used by the client are:
+
+- `/api/all-ebooks`, `/api/ebook/:id/:userId`
+- `/api/add-ebook`, `/api/edit-ebook/:id`, `/api/delete-ebook/:id`
+- `/api/publish-ebook/:userId`, `/api/admin/manage-ebook/*`
+- `/api/bookmarks/:userId`, `/api/toggle-bookmark/:userId`
+- `/api/user/purchased-books/:userId`, `/api/user/purchased-history/:userId`
+- `/api/writer/sales-history/:userId`
+- `/api/admin/all-users/:userId`, `/api/admin/all-transactions/:userId`
+- `/api/admin/analytics-overview/:userId`
+- `/api/create-checkout-session`, `/api/payment-success/:sessionId`
+- `/api/set-role`, `/api/verify-writer`
+
+Make sure the backend allows requests from the frontend origin and is reachable from both server actions and the browser. In production, use HTTPS URLs and configure Stripe webhook or payment confirmation behavior in the backend deployment.
+
+## Available Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Create a production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
+
+## Authentication Notes
+
+Better Auth is configured in `src/lib/auth.js` with MongoDB persistence and the admin plugin. The route proxy protects `/dashboard/*` and `/role-selector`, while `DashboardShell` repeats the session check on the client for a reliable loading and redirect experience.
+
+The role homes are:
+
+```text
+user   -> /dashboard/user
+writer -> /dashboard/writer
+admin  -> /dashboard/admin
+```
+
+## Deployment Checklist
+
+1. Set every required environment variable in the hosting provider.
+2. Deploy the backend API and set `NEXT_PUBLIC_SERVER_URL` to its public HTTPS URL.
+3. Set `NEXT_PUBLIC_BASE_URL` to the deployed frontend URL.
+4. Configure MongoDB network access for the deployed auth service.
+5. Configure Google OAuth redirect URLs if Google login is enabled.
+6. Configure Stripe success, cancel, and backend payment confirmation URLs.
+7. Confirm backend CORS allows the deployed frontend origin.
+8. Run `npm run lint` and `npm run build` before release.
+9. Test public routes, authentication, role redirects, ebook purchase, bookmarks, image upload, and dashboard reloads in production.
+
+## Demo Admin Account
+
+Do not publish real credentials in a public repository. If a seeded admin account is required for a private demo, configure it through the backend seed process or deployment secret manager.
+
+## License
+
+No license has been specified for this repository yet.

@@ -6,7 +6,7 @@ import { authClient } from "@/lib/auth-client";
 import Sidebar from "@/components/dashboard/SideBar";
 
 const roleHomes = {
-  reader: "/dashboard/user",
+  user: "/dashboard/user",
   writer: "/dashboard/writer",
   admin: "/dashboard/admin",
 };
@@ -15,14 +15,11 @@ export default function DashboardShell({ children }) {
   const { data: session, isPending } = authClient.useSession();
   const pathname = usePathname();
   const router = useRouter();
-  const role = session?.user?.role || "reader";
-  const home = roleHomes[role] || roleHomes.reader;
+  const role = session?.user?.role;
+  const home = roleHomes[role];
 
   const isProfileRoute = pathname === "/dashboard/my-profile";
-  const isAllowedRoute =
-    pathname === home ||
-    pathname.startsWith(`${home}/`) ||
-    isProfileRoute;
+
 
   useEffect(() => {
     if (isPending) return;
@@ -30,12 +27,12 @@ export default function DashboardShell({ children }) {
       router.replace("/login");
       return;
     }
-    if (!isAllowedRoute) {
-      router.replace(home);
+    if (role === null || role === undefined) {
+      router.replace("/role-selector");
     }
-  }, [home, isAllowedRoute, isPending, router, session]);
+  }, [home, isPending, router, session, role]);
 
-  if (isPending || !session || !isAllowedRoute) {
+  if (isPending || !session || role === null || role === undefined) {
     return (
       <div className="grid min-h-dvh place-items-center bg-bg-deep text-sm text-ink-muted">
         Loading your workspace…

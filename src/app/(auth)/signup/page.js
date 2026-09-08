@@ -14,7 +14,7 @@ export default function SignupPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: null, // "reader" or "writer"
+    role: null,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +46,7 @@ export default function SignupPage() {
     setErrors({});
     try {
       const formValues = new FormData(e.currentTarget);
-      const payload = Object.fromEntries(formValues.entries());      
+      const payload = Object.fromEntries(formValues.entries());
       const signupRole = payload.role || formData.role || "";
       const signupPayload = {
         name: payload.fullName,
@@ -58,7 +58,15 @@ export default function SignupPage() {
       }
 
       const { data, error } = await authClient.signUp.email(signupPayload);
-
+      if (data) {
+        await authClient.signOut({
+          fetchOptions: {
+            onSuccess: () => {
+              router.push("/login"); // redirect to login page
+            },
+          },
+        });
+      }
       if (error) {
         const errorMsg = error.message || "Registration failed";
         setErrors({ general: errorMsg });
@@ -67,12 +75,7 @@ export default function SignupPage() {
       }
 
       toast.success("Account created successfully!");
-      const userRole = data?.user?.role || signupRole;
-      if (!userRole) {
-        router.push("/role-selector");
-      } else {
-        router.push("/");
-      }
+      // const userRole = data?.user?.role || signupRole;
     } catch (err) {
       const errorMsg = err.message || "Registration failed";
       setErrors({ general: errorMsg });

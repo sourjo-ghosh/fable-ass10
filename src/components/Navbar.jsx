@@ -53,6 +53,13 @@ export default function Navbar() {
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
+  const roleDashboardMap = {
+    user: "/dashboard/user",
+    writer: "/dashboard/writer",
+    admin: "/dashboard/admin",
+  };
+  const dashboardHref = roleDashboardMap[user?.role] || "/dashboard";
+
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -238,7 +245,7 @@ export default function Navbar() {
 
                   {/* 2. Dashboard */}
                   <Link
-                    href="/dashboard"
+                    href={dashboardHref}
                     role="menuitem"
                     onClick={() => setUserDropdownOpen(false)}
                     className="flex cursor-pointer items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-ink-muted no-underline transition-colors hover:bg-gold-dim hover:text-gold"
@@ -401,7 +408,7 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/dashboard"
+                href={dashboardHref}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-ink-muted no-underline transition-colors hover:border-gold/30 hover:bg-gold-dim hover:text-gold"
               >

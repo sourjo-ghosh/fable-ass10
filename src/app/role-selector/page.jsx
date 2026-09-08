@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 const roles = [
   {
-    value: "reader",
+    value: "user",
     title: "Reader",
     description:
       "Discover new stories, build your library, and keep track of every book you love.",
@@ -31,24 +31,33 @@ export default function RoleSelectorPage() {
   const [selectedRole, setSelectedRole] = useState(null);
 
   useEffect(() => {
-    if (!isPending && session) {
+    if (!isPending && !session) {
       router.replace("/login");
       return;
     }
   }, [isPending, router, session]);
   const chooseRole = async (role) => {
     setSelectedRole(role.value);
-    const { error } = await authClient.updateUser({ role: role.value });
-
-    if (error) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/set-role`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ role: role.value, userId: session.user.id }),
+    });
+    if (!res.ok) {
       setSelectedRole(null);
-      toast.error(
-        error.message || "We couldn't save your role. Please try again.",
-      );
+      const errorText = await res.text();
+      toast.error(errorText || "We couldn't save your role. Please try again.");
       return;
     }
-    toast.success(`Welcome to Fable, ${role.title}!`);
-    router.replace("/");
+    const result = await res.json();
+    if (result.success) {
+      toast.success(result.message || "Your role has been saved successfully.");
+      const dest = role.value === "writer" ? "/dashboard/writer" : "/dashboard/user";
+      window.location.href = dest;
+      return;
+    }
   };
 
   if (isPending || !session) {

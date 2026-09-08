@@ -17,7 +17,7 @@ import {
 import { GoSidebarExpand } from "react-icons/go";
 
 const menus = {
-  reader: {
+  user: {
     title: "Reader space",
     items: [
       { href: "/dashboard/user", icon: FaChartPie, label: "Overview" },
@@ -135,7 +135,7 @@ function ProfileSummary({ onNavigate }) {
 }
 
 function Navigation({ onNavigate, role }) {
-  const menu = menus[role] || menus.reader;
+  const menu = menus[role] || menus.user;
   return (
     <nav className="mt-8 space-y-1" aria-label="Dashboard navigation">
       <p className="px-3 pb-2 text-[0.65rem] font-bold tracking-[0.18em] text-ink-faint uppercase">

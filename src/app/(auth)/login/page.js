@@ -51,10 +51,10 @@ export default function LoginPage() {
 
       toast.success("Welcome back!");
       const userRole = data?.user?.role;
-      if (!userRole) {
-        router.push("/role-selector");
+      if (userRole === null || userRole === undefined) {
+        window.location.href = "/role-selector";
       } else {
-        router.push("/");
+        window.location.href = "/";
       }
     } catch (err) {
       const errorMsg = err.message || "Invalid credentials";
@@ -69,10 +69,16 @@ export default function LoginPage() {
     setErrors({});
     setIsSubmitting(true);
     try {
-      await authClient.signIn.social({
+      const results = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/role-selector", 
+        callbackURL: "/role-selector",
       });
+      const userRole = results?.data?.user?.role;
+      if (userRole === null || userRole === undefined) {
+        window.location.href = "/role-selector";
+      } else {
+        window.location.href = "/";
+      }
     } catch (err) {
       setErrors({ general: err.message || "Unable to continue with Google" });
       toast.error(err.message || "Unable to continue with Google");

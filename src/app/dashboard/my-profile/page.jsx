@@ -149,7 +149,7 @@ export default function MyProfilePage() {
     );
   }
 
-  const role = user.role || "reader";
+  const role = user.role || "user";
   const roleHome =
     role === "admin"
       ? "/dashboard/admin"
